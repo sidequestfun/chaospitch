@@ -1073,7 +1073,7 @@
             .input-group button { width: auto; }
             .modal-content { padding: 20px; }
             
-            /* Mobile: Spieler-Card mit Medal neben Namen */
+            /* Mobile: Spieler-Card - kein Medal Icon, stattdessen Rangnummer als Text */
             .player-card { 
                 display: grid;
                 grid-template-columns: auto 1fr auto;
@@ -1081,9 +1081,12 @@
                 gap: 10px;
                 padding: 12px 16px;
             }
-            .player-card > div:first-child { 
-                width: auto;
-                font-size: 1.3rem;
+            .player-card .player-rank {
+                width: 32px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: #DD467F;
+                text-align: center;
             }
             .player-name { 
                 text-align: left;
@@ -1110,16 +1113,30 @@
                 flex-shrink: 0;
             }
             
-            /* Free Notice auf Mobile kleiner für 2 Zeilen */
-            .free-notice {
-                font-size: 0.7rem;
-                padding: 14px 12px;
-                gap: 8px;
-                flex-wrap: wrap;
-            }
+            /* Free Notice auf Mobile: Icon ausblenden, Text in eine Zeile */
             .free-notice i {
-                font-size: 1rem;
+                display: none;
             }
+            .free-notice {
+                font-size: 0.65rem;
+                padding: 12px 8px;
+                gap: 0;
+                white-space: nowrap;
+                flex-wrap: nowrap;
+            }
+            .free-notice span {
+                white-space: nowrap;
+                overflow-x: auto;
+                max-width: 100%;
+            }
+        }
+        
+        /* Desktop: Spieler-Card mit Rangnummer für alle Plätze (ohne Medal Icons) */
+        .player-rank {
+            width: 40px;
+            font-weight: 700;
+            color: #DD467F;
+            text-align: center;
         }
         
         .new-round { animation: fadeIn 0.4s ease-out; }
@@ -1588,7 +1605,11 @@
             if (!container) return;
             const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
             if (sortedPlayers.length === 0) { container.innerHTML = '<div class="empty-list-message"><i class="fas fa-users"></i> Noch keine Spieler vorhanden.</div>'; renderLeaderboard(); return; }
-            container.innerHTML = sortedPlayers.map((p, idx) => { let medalIcon = idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':''; return `<div class="player-card"><div>${medalIcon}</div><span class="player-name">${escapeHtml(p.name)}</span><div class="player-actions"><button class="player-btn minus" data-name="${escapeHtml(p.name)}" data-delta="-1">-</button><span class="player-score">${p.score}</span><button class="player-btn plus" data-name="${escapeHtml(p.name)}" data-delta="1">+</button><button class="player-btn delete" data-name="${escapeHtml(p.name)}"><i class="fas fa-trash"></i></button></div></div>`; }).join('');
+            // Rangnummern statt Medaillen-Icons (1, 2, 3, 4, ...)
+            container.innerHTML = sortedPlayers.map((p, idx) => { 
+                const rankNumber = (idx + 1).toString();
+                return `<div class="player-card"><div class="player-rank">${rankNumber}</div><span class="player-name">${escapeHtml(p.name)}</span><div class="player-actions"><button class="player-btn minus" data-name="${escapeHtml(p.name)}" data-delta="-1">-</button><span class="player-score">${p.score}</span><button class="player-btn plus" data-name="${escapeHtml(p.name)}" data-delta="1">+</button><button class="player-btn delete" data-name="${escapeHtml(p.name)}"><i class="fas fa-trash"></i></button></div></div>`;
+            }).join('');
             document.querySelectorAll('.player-btn.plus, .player-btn.minus').forEach(btn => btn.addEventListener('click', () => { const name = btn.dataset.name; const delta = parseInt(btn.dataset.delta); const idx = players.findIndex(p => p.name === name); if(idx!==-1){ players[idx].score = Math.max(0, players[idx].score+delta); localStorage.setItem('chaos_players', JSON.stringify(players)); renderPlayers(); if(delta>0) triggerConfetti(); } }));
             document.querySelectorAll('.player-btn.delete').forEach(btn => btn.addEventListener('click', () => { const name = btn.dataset.name; players = players.filter(p => p.name !== name); localStorage.setItem('chaos_players', JSON.stringify(players)); renderPlayers(); showToast("Spieler gelöscht", false); }));
             renderLeaderboard();
@@ -1749,6 +1770,15 @@
         document.getElementById('closePrivacyModal')?.addEventListener('click',()=>document.getElementById('privacyModal').style.display='none');
         document.getElementById('resetAllBtn')?.addEventListener('click', resetAllData);
         
+        // Schließe Modals durch Klick auf den Hintergrund (Mobile und Desktop)
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        
         const onlyCustomCheckbox = document.getElementById('onlyCustomCardsToggle');
         if(onlyCustomCheckbox) {
             onlyCustomCheckbox.checked = onlyCustomMode;
@@ -1759,8 +1789,6 @@
         if(darkModeSwitch) {
             darkModeSwitch.addEventListener('change', toggleDarkMode);
         }
-        
-        window.addEventListener('click',(e)=>{ if(e.target.classList.contains('modal')) e.target.style.display='none'; });
         
         window.addEventListener('load', async () => {
             rebuildPools();
