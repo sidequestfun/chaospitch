@@ -12,7 +12,7 @@ Jetzt spielen: [chaospitch.com](https://chaospitch.com)
 
 ## 🔧Tech
 - Magic Links enthalten dein komplettes Kartendeck (Base64-kodiert)
-- Standalone HTML-Datei mit Tailwind CSS & Alpine.js.
+- Standalone HTML-Datei mit Tailwind CSS & Alpine.js. Läuft ohne Datenbank.
 
-## 📄 Lizenz
+## 📄 Hinweis
 Dieses Projekt ist ein privates, nicht-kommerzielles Hobbyprojekt. Alle Rechte vorbehalten.
