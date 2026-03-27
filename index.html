@@ -242,11 +242,12 @@
         }
         
         h1 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 8px;
             color: #1e1e2a;
             text-align: center;
             font-weight: 800;
+            white-space: nowrap;
         }
         
         body.dark-mode h1 {
@@ -702,11 +703,16 @@
             background: #f5f5f7;
             border-radius: 60px;
             margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         
         .player-name {
             font-weight: 600;
             font-size: 1rem;
+            flex: 1;
+            min-width: 100px;
+            word-break: break-word;
         }
         
         .player-score {
@@ -766,6 +772,12 @@
             background: #f5f5f7;
             border-radius: 50px;
             margin-bottom: 8px;
+            gap: 8px;
+        }
+        
+        .custom-card-item span {
+            flex: 1;
+            word-break: break-word;
         }
         
         .delete-card-btn {
@@ -777,6 +789,7 @@
             padding: 5px 10px;
             border-radius: 50%;
             transition: all 0.2s;
+            flex-shrink: 0;
         }
         
         .delete-card-btn:hover {
@@ -790,6 +803,8 @@
             align-items: center;
             padding: 16px 0;
             border-bottom: 1px solid #efeff4;
+            flex-wrap: wrap;
+            gap: 12px;
         }
         
         .settings-row:last-child {
@@ -1008,6 +1023,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
         
         .btn-add:hover {
@@ -1020,18 +1036,45 @@
             border-radius: 50px !important;
         }
         
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 60px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+        
         @media (max-width: 700px) {
             .container { padding: 15px; }
+            h1 { font-size: 1.4rem; white-space: normal; text-align: center; }
             .logo-placeholder { height: auto; padding: 0; }
-            .logo-img { height: 64px; }
+            .logo-img { height: 52px; }
             .problem-text { font-size: 1.25rem; }
             .tools-grid { flex-direction: column; }
             .tool-card { min-width: auto; }
             .notification-toast { top: 10px; right: 10px; font-size: 0.8rem; padding: 8px 16px; }
-            .player-card { flex-wrap: wrap; gap: 8px; }
-            .mode-option { padding: 6px 16px; font-size: 0.8rem; }
+            .mode-option { padding: 6px 12px; font-size: 0.75rem; }
             .leaderboard-compact { gap: 12px; }
             .import-export-bar { flex-direction: column; align-items: center; }
+            .btn-add span.text { display: none; }
+            .btn-add { padding: 10px 16px; }
+            .btn-add i { margin: 0; }
+            .input-group { flex-wrap: wrap; }
+            .input-group button { width: auto; }
+            .modal-content { padding: 20px; }
+            .player-card { flex-direction: column; align-items: stretch; text-align: center; }
+            .player-name { text-align: center; }
+            .player-actions { justify-content: center; }
+            .settings-row { flex-direction: column; align-items: flex-start; }
+            .settings-row select { width: 100%; }
+            .custom-card-item { flex-wrap: wrap; justify-content: center; text-align: center; }
+            .custom-card-item span { width: 100%; text-align: center; margin-bottom: 8px; }
         }
         
         .new-round { animation: fadeIn 0.4s ease-out; }
@@ -1148,9 +1191,9 @@
                 <button class="close-modal close-score-modal">&times;</button>
             </div>
             <div id="playersContainer"></div>
-            <div style="margin-top: 20px; display: flex; gap: 12px;">
-                <input type="text" id="newPlayerName" placeholder="Spielername" style="flex:1; padding: 12px 18px; border-radius: 60px; border: 1px solid #ddd; font-size: 1rem;">
-                <button id="addPlayerBtn" class="btn-add"><i class="fas fa-user-plus"></i> Spieler hinzufügen</button>
+            <div class="input-group">
+                <input type="text" id="newPlayerName" placeholder="Spielername">
+                <button id="addPlayerBtn" class="btn-add"><i class="fas fa-user-plus"></i><span class="text"> Spieler hinzufügen</span></button>
             </div>
         </div>
     </div>
@@ -1166,16 +1209,16 @@
             </div>
             <div style="margin-bottom: 20px;">
                 <h4 style="margin-bottom: 10px;">➕ Neues Problem</h4>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="customProblem" placeholder="Neues Problem" style="flex:1; padding: 10px; border-radius: 40px; border: 1px solid #ddd;">
-                    <button id="addProblemBtn" class="btn-add"><i class="fas fa-plus"></i> Hinzufügen</button>
+                <div class="input-group" style="margin-top: 0;">
+                    <input type="text" id="customProblem" placeholder="Neues Problem">
+                    <button id="addProblemBtn" class="btn-add"><i class="fas fa-plus"></i><span class="text"> Hinzufügen</span></button>
                 </div>
             </div>
             <div style="margin-bottom: 20px;">
                 <h4 style="margin-bottom: 10px;">➕ Neues Hilfsmittel</h4>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="customTool" placeholder="Neues Hilfsmittel" style="flex:1; padding: 10px; border-radius: 40px; border: 1px solid #ddd;">
-                    <button id="addToolBtn" class="btn-add"><i class="fas fa-plus"></i> Hinzufügen</button>
+                <div class="input-group" style="margin-top: 0;">
+                    <input type="text" id="customTool" placeholder="Neues Hilfsmittel">
+                    <button id="addToolBtn" class="btn-add"><i class="fas fa-plus"></i><span class="text"> Hinzufügen</span></button>
                 </div>
             </div>
             
@@ -1330,7 +1373,6 @@
             const link = generateShareLink();
             if (!link) return;
             
-            // Versuche das native Share-Menü zu öffnen
             if (navigator.share) {
                 navigator.share({
                     title: 'CHAOS PITCH - Mein Kartendeck',
@@ -1338,12 +1380,10 @@
                     url: link
                 }).catch(err => {
                     if (err.name !== 'AbortError') {
-                        // Fallback: Link in Zwischenablage kopieren
                         fallbackCopyLink(link);
                     }
                 });
             } else {
-                // Fallback für Geräte ohne Share-API
                 fallbackCopyLink(link);
             }
         }
@@ -1357,7 +1397,6 @@
         }
         
         function mergeAndImport(importedProblems, importedTools, packName) {
-            // Zusammenführen (Merge) statt Überschreiben - Duplikate vermeiden
             const existingProblemsSet = new Set(customProblems);
             const existingToolsSet = new Set(customTools);
             
