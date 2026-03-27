@@ -1748,6 +1748,15 @@
         document.getElementById('closeSettingsModal')?.addEventListener('click',()=>document.getElementById('settingsModal').style.display='none');
         document.getElementById('closePrivacyModal')?.addEventListener('click',()=>document.getElementById('privacyModal').style.display='none');
         document.getElementById('resetAllBtn')?.addEventListener('click', resetAllData);
+       
+        // Schließe Modals durch Klick auf den Hintergrund (Mobile und Desktop)
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
         
         const onlyCustomCheckbox = document.getElementById('onlyCustomCardsToggle');
         if(onlyCustomCheckbox) {
