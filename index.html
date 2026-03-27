@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CHAOS PITCH – Das chaotische Partyspiel</title>
+
+    <meta name="description" content="CHAOS PITCH – Das kreative Partyspiel für Spieleabende. Löse absurde Probleme mit noch absurderen Hilfsmitteln. Kostenlos, ohne Anmeldung. Perfekt für Partys, Geburtstage und Spieleabende.">
+    <meta name="keywords" content="partyspiel, karten gegen die menschheit, pitch game, kreativitätsspiel, spieleabend, lustige spiele, problem lösung spiel, party spiele, erwachsenenspiele, gruppenspiele">
+    <meta name="author" content="CHAOS PITCH">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://chaospitch.com">
+    <meta property="og:title" content="CHAOS PITCH – Das chaotische Partyspiel">
+    <meta property="og:description" content="Löse absurde Probleme mit noch absurderen Hilfsmitteln. Jetzt kostenlos spielen!">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CHAOS PITCH">
+    <meta property="og:image" content="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, 'Helvetica Neue', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        body {
+            background-color: #f5f5f7;
+            color: #1e1e2a;
+            line-height: 1.5;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        /* Dark Mode - angepasste Farben für bessere Lesbarkeit */
+        body.dark-mode {
+            background-color: #12121a;
+            color: #eef2ff;
+        }
+        
+        body.dark-mode .card {
+            background-color: #252530;
+            border-color: #353540;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        body.dark-mode .game-card {
+            background: linear-gradient(145deg, #2d2d3a 0%, #22222c 100%);
+            border: 1px solid #40404d;
+        }
+        
+        body.dark-mode .tool-card {
+            background: #3d3d4d;
+            border-color: #555565;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        body.dark-mode .tool-card:hover {
+            border-color: #ff7b9c;
+            background: #4d4d60;
+        }
+        
+        body.dark-mode .tool-desc {
+            color: #ffffff;
+        }
+        
+        body.dark-mode .free-notice {
+            background-color: #252530;
+            border-color: #353540;
+            color: #ddd;
+        }
+        
+        body.dark-mode .info-card p, body.dark-mode .info-card li {
+            color: #cfd5e6;
+        }
+        
+        body.dark-mode .footer {
+            border-top-color: #353540;
+        }
+        
+        body.dark-mode .modal-content,
+        body.dark-mode .settings-modal-content {
+            background-color: #252530;
+            color: #eef2ff;
+        }
+        
+        body.dark-mode .close-modal {
+            color: #aaa;
+        }
+        
+        body.dark-mode .close-modal:hover {
+            background-color: #353540;
+        }
+        
+        body.dark-mode .footer-link {
+            color: #b0b0c8;
+        }
+        
+        body.dark-mode .footer-link:hover {
+            color: #ff7b9c;
+        }
+        
+        body.dark-mode .mode-selector-bar {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #353540;
+        }
+        
+        body.dark-mode .mode-option {
+            color: #a5a5c0;
+        }
+        
+        body.dark-mode .mode-option.active {
+            background: #ff7b9c;
+            color: #1a1a24;
+        }
+        
+        body.dark-mode .mode-option:hover:not(.active) {
+            background: #353540;
+            color: #ffffff;
+        }
+        
+        body.dark-mode .mini-menu-btn {
+            background: #2f2f3d;
+            color: #eef2ff;
+            border-color: #454552;
+        }
+        
+        body.dark-mode .mini-menu-btn:hover {
+            background: #ff7b9c;
+            color: #1a1a24;
+        }
+        
+        body.dark-mode .player-card {
+            background: #2f2f3d;
+        }
+        
+        body.dark-mode .custom-card-item {
+            background: #2f2f3d;
+            border-color: #454552;
+        }
+        
+        body.dark-mode .leaderboard-compact {
+            background: rgba(0, 0, 0, 0.45);
+            border-color: #353540;
+        }
+        
+        body.dark-mode .leaderboard-score {
+            background: #ff7b9c40;
+            color: #ffb0c5;
+        }
+        
+        body.dark-mode .settings-row select, 
+        body.dark-mode .settings-row .dark-toggle-modal {
+            background: #2f2f3d;
+            border-color: #454552;
+            color: #eef2ff;
+        }
+        
+        body.dark-mode .btn-primary {
+            background-color: #dd467f;
+        }
+        
+        body.dark-mode .btn-primary:hover {
+            background-color: #c43b6e;
+        }
+        
+        body.dark-mode .btn-timer {
+            background-color: #0f9ec0;
+        }
+        
+        body.dark-mode .btn-timer:hover {
+            background-color: #0e8bb0;
+        }
+        
+        body.dark-mode input, 
+        body.dark-mode #newPlayerName,
+        body.dark-mode #customProblem,
+        body.dark-mode #customTool {
+            background-color: #2f2f3d;
+            border-color: #454552;
+            color: #eef2ff;
+        }
+        
+        body.dark-mode input::placeholder {
+            color: #8a8aa0;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 28px;
+            padding: 0;
+        }
+        
+        .logo-placeholder {
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: auto;
+            width: auto;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            transition: all 0.2s ease;
+        }
+        
+        .logo-img {
+            height: 88px;
+            width: auto;
+            display: block;
+            object-fit: contain;
+            max-width: 400px;
+        }
+        
+        .logo-fallback {
+            display: none;
+            color: #DD467F;
+            font-size: 2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        
+        .logo-placeholder:hover {
+            transform: scale(1.01);
+            background: transparent;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: #1e1e2a;
+            text-align: center;
+            font-weight: 800;
+        }
+        
+        body.dark-mode h1 {
+            color: #ffffff;
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            color: #5a5a6e;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        
+        .mode-selector-bar {
+            background: white;
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            border: 1px solid #efeff4;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .mode-option {
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            color: #8e8e9e;
+        }
+        
+        .mode-option:hover:not(.active) {
+            background: #f0f0f5;
+            color: #5a5a6e;
+        }
+        
+        .mode-option.active {
+            background: #DD467F;
+            color: white;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 28px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            border: 1px solid #efeff4;
+        }
+        
+        .game-card {
+            background: linear-gradient(145deg, #14141f 0%, #0c0c16 100%);
+            color: white;
+            border: none;
+            padding: 32px;
+            box-shadow: 0 18px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .problem-section {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 28px;
+            margin-bottom: 28px;
+        }
+        
+        .problem-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 700;
+            color: #ff7b9c;
+            margin-bottom: 12px;
+        }
+        
+        .problem-text {
+            font-size: 1.65rem;
+            font-weight: 700;
+            line-height: 1.4;
+            color: white;
+        }
+        
+        .tools-section h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: #b0b0c0;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .tools-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px 18px;
+            flex: 1;
+            min-width: 180px;
+            text-align: center;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #eaeef2;
+            position: relative;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+            border-color: #ff7b9c;
+        }
+        
+        .tool-number {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #ff5a7c;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .tool-desc {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1f1f2e;
+            line-height: 1.4;
+        }
+        
+        @keyframes shuffleFlip {
+            0% { transform: rotateY(0deg) scale(1); opacity: 1; }
+            25% { transform: rotateY(90deg) scale(0.9); opacity: 0.7; }
+            50% { transform: rotateY(180deg) scale(0.95); opacity: 0.8; }
+            75% { transform: rotateY(270deg) scale(1); opacity: 0.9; }
+            100% { transform: rotateY(360deg) scale(1); opacity: 1; }
+        }
+        
+        @keyframes shuffleSlide {
+            0% { transform: translateX(0px) rotate(0deg); }
+            20% { transform: translateX(-8px) rotate(-2deg); }
+            40% { transform: translateX(8px) rotate(2deg); }
+            60% { transform: translateX(-5px) rotate(-1deg); }
+            80% { transform: translateX(5px) rotate(1deg); }
+            100% { transform: translateX(0px) rotate(0deg); }
+        }
+        
+        .tool-card.shuffling {
+            animation: shuffleFlip 0.4s ease-in-out, shuffleSlide 0.2s ease-in-out;
+            animation-fill-mode: forwards;
+        }
+        
+        .problem-text.shuffling {
+            animation: shuffleSlide 0.3s ease-in-out;
+        }
+        
+        .buttons-container {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 14px 34px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: #DD467F;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c43b6e;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(221, 70, 127, 0.3);
+        }
+        
+        .btn-timer {
+            background-color: #14B3D9;
+            color: white;
+            min-width: 160px;
+            justify-content: center;
+        }
+        
+        .btn-timer:hover {
+            background-color: #0f9ec0;
+            transform: translateY(-2px);
+        }
+        
+        .btn-timer.timer-active {
+            background-color: #2ecc71;
+        }
+        
+        .btn-timer.timer-expired {
+            background-color: #95a5a6;
+            cursor: default;
+            opacity: 0.8;
+        }
+        
+        .timer-display {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .leaderboard-compact {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 60px;
+            padding: 10px 20px;
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(2px);
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+        
+        .leaderboard-medal {
+            font-size: 1.2rem;
+        }
+        
+        .leaderboard-name {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .leaderboard-score {
+            background: #DD467F;
+            padding: 4px 12px;
+            border-radius: 30px;
+            color: white;
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+        
+        .info-card h2 {
+            color: #DD467F;
+            margin-bottom: 18px;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+        
+        .info-card h3 {
+            margin: 20px 0 8px 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e1e2a;
+        }
+        
+        body.dark-mode .info-card h3 {
+            color: #eef2ff;
+        }
+        
+        .info-card ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .info-card li {
+            margin-bottom: 10px;
+            color: #2d2d3a;
+        }
+        
+        .divider {
+            margin: 24px 0;
+            border: none;
+            height: 1px;
+            background-color: #e2e8f0;
+            width: 100%;
+        }
+        
+        body.dark-mode .divider {
+            background-color: #353540;
+        }
+        
+        .free-notice {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            color: #2b2b3a;
+            font-size: 0.95rem;
+            padding: 20px 24px;
+            background-color: #fafafc;
+            border-radius: 24px;
+            border: 1px solid #e9eef2;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .free-notice i {
+            color: #DD467F;
+            font-size: 1.4rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px 0 20px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 20px;
+        }
+        
+        .footer-link {
+            color: #6c6c81;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-link:hover {
+            color: #DD467F;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        
+        .modal-content, .settings-modal-content {
+            background-color: white;
+            border-radius: 32px;
+            padding: 32px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.25);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.6rem;
+            color: #DD467F;
+            font-weight: 800;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        
+        .close-modal:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .mini-menu {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .mini-menu-btn {
+            background: white;
+            border: 1px solid #e0e4e8;
+            padding: 10px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #1e1e2a;
+        }
+        
+        .mini-menu-btn:hover {
+            background: #DD467F;
+            color: white;
+            border-color: #DD467F;
+            transform: translateY(-2px);
+        }
+        
+        .player-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f5f5f7;
+            border-radius: 60px;
+            margin-bottom: 10px;
+        }
+        
+        .player-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .player-score {
+            background: #DD467F;
+            color: white;
+            border-radius: 40px;
+            padding: 4px 14px;
+            font-weight: bold;
+            min-width: 70px;
+            text-align: center;
+        }
+        
+        .player-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .player-btn {
+            background: none;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .player-btn.plus {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .player-btn.minus {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .player-btn.delete {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .player-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .custom-card-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f5f5f7;
+            border-radius: 50px;
+            margin-bottom: 8px;
+        }
+        
+        .delete-card-btn {
+            background: none;
+            border: none;
+            color: #ff5a7c;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px 10px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .delete-card-btn:hover {
+            background: rgba(255, 90, 124, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #efeff4;
+        }
+        
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-row label {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .settings-row select {
+            padding: 10px 20px;
+            border-radius: 40px;
+            border: 1px solid #ddd;
+            background: #f5f5f7;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .reset-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: auto;
+        }
+        
+        .reset-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        /* Switch Toggle Style */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #DD467F;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .settings-row .switch-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Hellgrauer Hinweis für Einstellungen */
+        .settings-warning-hint {
+            background-color: #f0f0f5;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 16px;
+            text-align: center;
+            color: #5a5a6e;
+            border: 1px solid #e2e6ea;
+        }
+        
+        body.dark-mode .settings-warning-hint {
+            background-color: #2a2a36;
+            border-color: #3d3d4a;
+            color: #b0b0c8;
+        }
+        
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .notification-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        body.dark-mode .notification-toast {
+            background-color: #2ecc71;
+            color: #1a1a2e;
+        }
+        
+        .privacy-text p {
+            margin-bottom: 16px;
+        }
+        
+        .empty-list-message {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+        
+        .import-export-bar {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        body.dark-mode .import-export-bar {
+            border-top-color: #353540;
+        }
+        
+        .share-link-btn {
+            background-color: #DD467F;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .share-link-btn:hover {
+            background-color: #c43b6e;
+            transform: translateY(-2px);
+        }
+        
+        .storage-hint-gray {
+            background-color: #f0f0f5;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #5a5a6e;
+            border: 1px solid #e2e6ea;
+        }
+        
+        body.dark-mode .storage-hint-gray {
+            background-color: #2a2a36;
+            border-color: #3d3d4a;
+            color: #b0b0c8;
+        }
+        
+        /* Einheitliche Button-Stile */
+        .btn-add {
+            background-color: #DD467F;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-add:hover {
+            background-color: #c43b6e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(221, 70, 127, 0.3);
+        }
+        
+        .add-button-rounded {
+            border-radius: 50px !important;
+        }
+        
+        @media (max-width: 700px) {
+            .container { padding: 15px; }
+            .logo-placeholder { height: auto; padding: 0; }
+            .logo-img { height: 64px; }
+            .problem-text { font-size: 1.25rem; }
+            .tools-grid { flex-direction: column; }
+            .tool-card { min-width: auto; }
+            .notification-toast { top: 10px; right: 10px; font-size: 0.8rem; padding: 8px 16px; }
+            .player-card { flex-wrap: wrap; gap: 8px; }
+            .mode-option { padding: 6px 16px; font-size: 0.8rem; }
+            .leaderboard-compact { gap: 12px; }
+            .import-export-bar { flex-direction: column; align-items: center; }
+        }
+        
+        .new-round { animation: fadeIn 0.4s ease-out; }
+        .shake { animation: shakeAnim 0.3s ease-in-out; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes shakeAnim {
+            0%,100%{ transform: translateX(0); }
+            25%{ transform: translateX(-4px); }
+            75%{ transform: translateX(4px); }
+        }
+        
+        .timer-hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <div class="logo-placeholder">
+                <img class="logo-img" src="logo.png" alt="CHAOS PITCH Logo" onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block';">
+                <span class="logo-fallback">CHAOS PITCH</span>
+            </div>
+        </div>
+        
+        <h1>Das chaotische Partyspiel</h1>
+        <p class="tagline">Löse absurde Probleme mit noch absurderen Hilfsmitteln</p>
+        
+        <div class="mode-selector-bar" id="modeSelector">
+            <div class="mode-option active" data-mode="standard">Standard</div>
+            <div class="mode-option" data-mode="speed">Speed-Pitch</div>
+            <div class="mode-option" data-mode="crime">Crime-Pitch</div>
+        </div>
+
+        <div class="card game-card" id="gameCard">
+            <div class="problem-section">
+                <div class="problem-label" id="problemLabel">DAS PROBLEM</div>
+                <div class="problem-text" id="problemText">Klick auf „Neue Runde“</div>
+            </div>
+            
+            <div class="tools-section">
+                <h3 id="toolsLabel"><i class="fas fa-tools"></i> DEINE HILFSMITTEL (mindestens 1 verwenden)</h3>
+                <div class="tools-grid" id="toolsGrid"></div>
+            </div>
+            
+            <div class="buttons-container">
+                <button class="btn btn-primary" id="newGameBtn"><i class="fas fa-play"></i> Neue Runde</button>
+                <button class="btn btn-timer" id="timerBtn"><i class="fas fa-hourglass-half"></i> <span id="timerLabel">Timer starten</span></button>
+            </div>
+            
+            <div id="leaderboardCompact" class="leaderboard-compact" style="display: none;"></div>
+        </div>
+        
+        <div class="mini-menu">
+            <button class="mini-menu-btn" id="openScoreModalBtn"><i class="fas fa-trophy"></i> Spieler & Punkte</button>
+            <button class="mini-menu-btn" id="openCustomModalBtn"><i class="fas fa-plus-circle"></i> Eigene Karten</button>
+        </div>
+        
+        <div class="card info-card">
+            <h2>So wird's gespielt</h2>
+            <p>Du bekommst ein Problem und 3 Hilfsmittel. Erfinde eine kreative Lösung – mindestens eines der Hilfsmittel muss vorkommen! Je absurder, desto besser. Die Gruppe kürt den besten Pitch.</p>
+            
+            <h3>⚡ Speed-Mode</h3>
+            <p>Kein langes Überlegen! Du hast nur 20 Sekunden Zeit, um ein einziges Hilfsmittel in eine rettende Idee zu verwandeln. Leg sofort los, bevor der Timer abläuft!</p>
+            
+            <h3>🔪 Crime-Mode</h3>
+            <p>Werde zum Ermittler an einem mysteriösen Tatort. Nutze die drei gefundenen Beweismittel, um zu erklären, was hier wirklich passiert ist.</p>
+            
+            <hr class="divider">
+            
+            <h3>Warum CHAOS PITCH?</h3>
+            <p>Hier zählt spontane Kreativität, schwarzer Humor und die Fähigkeit, aus drei nutzlosen Gegenständen einen genialen Rettungsplan zu zaubern. Keine zwei Runden sind gleich – und du entdeckst die versteckten Comedy-Talente deiner Freunde.</p>
+        </div>
+        
+        <div class="card info-card">
+            <h2>Zusatzregeln für noch mehr Chaos</h2>
+            <ul>
+                <li>Einigt euch auf Begriffe, die während des Pitches verboten sind (z. B. „und“, „weil“ oder „aber“). Wer sie sagt, verliert sofort!</li>
+                <li>Deine Mitspieler kennen deine Hilfsmittel nicht. Sie müssen nach deinem Pitch erraten, welche absurden Gegenstände du eigentlich einbauen musstest.</li>
+                <li>Worte sind überbewertet. Präsentiere deine Lösung ausschließlich durch Pantomime, Mimik oder Zeichnen.</li>
+                <li>Zwei Spieler müssen gemeinsam pitchen und sich dabei abwechseln (z. B. nach jedem Satz), ohne sich vorher abzusprechen.</li>
+                <li>Ein Mitspieler darf mitten in deinen Pitch ein beliebiges Wort reinrufen. Du musst dieses zusätzliche "Hilfsmittel" sofort und ohne Zögern in deine Argumentation einbauen.</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <div class="free-notice">
+                <i class="fas fa-check-circle"></i>
+                <span>100% kostenlos • Keine Werbung • Kein Account • Sofort losspielen</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <a class="footer-link" id="settingsLink"><i class="fas fa-cog"></i> Einstellungen</a>
+        <a class="footer-link" id="privacyLink"><i class="fas fa-shield-alt"></i> Datenschutz</a>
+    </div>
+    
+    <!-- Toast Notification oben rechts -->
+    <div id="toastNotification" class="notification-toast">
+        <i class="fas fa-info-circle"></i>
+        <span id="toastText"></span>
+    </div>
+    
+    <div id="scoreModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-trophy"></i> Spieler & Punkte</h2>
+                <button class="close-modal close-score-modal">&times;</button>
+            </div>
+            <div id="playersContainer"></div>
+            <div style="margin-top: 20px; display: flex; gap: 12px;">
+                <input type="text" id="newPlayerName" placeholder="Spielername" style="flex:1; padding: 12px 18px; border-radius: 60px; border: 1px solid #ddd; font-size: 1rem;">
+                <button id="addPlayerBtn" class="btn-add"><i class="fas fa-user-plus"></i> Spieler hinzufügen</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="customModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-plus-circle"></i> Eigene Karten</h2>
+                <button class="close-modal close-custom-modal">&times;</button>
+            </div>
+            <div class="storage-hint-gray">
+                Deine Karten werden nur lokal auf diesem Gerät gespeichert. Nutze „Per Link teilen“, um alle deine eigenen Karten sofort per Link an Freunde zu senden, oder speichere dein Deck als Datei ab.
+            </div>
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;">➕ Neues Problem</h4>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="customProblem" placeholder="Neues Problem" style="flex:1; padding: 10px; border-radius: 40px; border: 1px solid #ddd;">
+                    <button id="addProblemBtn" class="btn-add"><i class="fas fa-plus"></i> Hinzufügen</button>
+                </div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;">➕ Neues Hilfsmittel</h4>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="customTool" placeholder="Neues Hilfsmittel" style="flex:1; padding: 10px; border-radius: 40px; border: 1px solid #ddd;">
+                    <button id="addToolBtn" class="btn-add"><i class="fas fa-plus"></i> Hinzufügen</button>
+                </div>
+            </div>
+            
+            <div id="customProblemsSection" style="display: none;">
+                <h4 style="margin-bottom: 10px;">📋 Eigene Probleme</h4>
+                <div id="customProblemsList"></div>
+            </div>
+            <div id="customToolsSection" style="display: none;">
+                <h4 style="margin: 15px 0 10px;">🛠️ Eigene Hilfsmittel</h4>
+                <div id="customToolsList"></div>
+            </div>
+            
+            <div class="import-export-bar">
+                <button id="shareDeckBtn" class="share-link-btn"><i class="fas fa-share-alt"></i> Per Link teilen</button>
+                <button id="exportCardsBtn" class="mini-menu-btn" style="background:#DD467F; color:white;"><i class="fas fa-download"></i> Als Datei speichern</button>
+                <label for="importCardsFile" class="mini-menu-btn" style="cursor:pointer;"><i class="fas fa-upload"></i> Datei Importieren</label>
+                <input type="file" id="importCardsFile" accept=".json" style="display:none;">
+            </div>
+        </div>
+    </div>
+    
+    <div id="settingsModal" class="modal">
+        <div class="settings-modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-cog"></i> Einstellungen</h2>
+                <button class="close-modal" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="settings-section">
+                <div class="settings-row">
+                    <span><i class="fas fa-moon"></i> Dark Mode</span>
+                    <label class="switch-label">
+                        <span style="margin-right: 8px; font-size: 0.85rem; color: #888;" id="darkModeStatus">Aus</span>
+                        <label class="switch">
+                            <input type="checkbox" id="darkModeSwitch">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <span><i class="fas fa-layer-group"></i> Nur eigene Karten</span>
+                    <label class="switch-label">
+                        <span style="margin-right: 8px; font-size: 0.85rem; color: #888;" id="onlyCustomStatus">Aus</span>
+                        <label class="switch">
+                            <input type="checkbox" id="onlyCustomCardsToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <span><i class="fas fa-stopwatch"></i> Speed-Pitch Dauer</span>
+                    <select id="timerDurationSelectModal">
+                        <option value="10">10 Sekunden</option>
+                        <option value="20" selected>20 Sekunden</option>
+                        <option value="30">30 Sekunden</option>
+                        <option value="40">40 Sekunden</option>
+                        <option value="60">60 Sekunden</option>
+                    </select>
+                </div>
+                <div class="settings-row">
+                    <span><i class="fas fa-trash-alt"></i> Alles zurücksetzen</span>
+                    <button id="resetAllBtn" class="reset-btn"><i class="fas fa-trash"></i> Löschen</button>
+                </div>
+            </div>
+            <div id="onlyCustomWarning" class="settings-warning-hint" style="display: none;">
+                Hinweis: Für "Nur eigene Karten" sollten mindestens 5 eigene Probleme und 10 eigene Hilfsmittel vorhanden sein.
+            </div>
+        </div>
+    </div>
+    
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Datenschutz</h2>
+                <button class="close-modal" id="closePrivacyModal">&times;</button>
+            </div>
+            <div class="privacy-text">
+                <p>Diese Website ist ein privates, nicht-kommerzielles Hobbyprojekt, das ausschließlich Unterhaltungszwecken dient. Die Inhalte werden ohne jegliche Gewährleistung bereitgestellt. Jegliche Haftung für Schäden jeglicher Art wird ausgeschlossen.</p>
+                <p>Wir erheben, speichern oder verarbeiten keine personenbezogenen Daten unserer Besucher. Beim Zugriff auf die Website werden technisch notwendige Daten (wie z. B. IP-Adressen) von GitHub als Hosting-Anbieter verarbeitet.</p>
+                <p>Um eine optimale Benutzererfahrung zu gewährleisten und visuelle Elemente (Icons, Schriftarten und Effekte) bereitzustellen, lädt diese Website externe Bibliotheken von Content Delivery Networks (CDNs). Beim Laden dieser Ressourcen wird Ihre IP-Adresse an die jeweiligen Anbieter übermittelt, um die Dateien an Ihren Browser zu senden. Dies ist technisch notwendig, damit die Website korrekt funktioniert.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const PROBLEMS = ["Dein Friseur hat dir versehentlich eine Glatze geschnitten.","Du hast 2 kg Brokkoli bestellt, aber 200 kg geliefert bekommen.","Deine Schwiegermutter zieht für \"unbestimmte Zeit\" in dein Gästezimmer.","Du hast aus Versehen \"Ich liebe dich\" am Ende eines Vorstellungsgesprächs gesagt.","Deine einzige Hose ist im Schritt gerissen – 5 Minuten vor einer wichtigen Präsentation.","Deine Kinder haben die Wände mit Permanentmarker verziert.","Dein Handy fällt ins Klo während eines Dates.","Du hast aus Versehen deinem Chef \"Ich liebe dich\" geschrieben.","Du sitzt im falschen Flugzeug und merkst es erst in der Luft.","Du hast dein Passwort überall gleich – und es wurde gehackt.","Dein Name wurde offiziell falsch im Pass eingetragen.","Dein Lieblingsessen schmeckt plötzlich nach Seife.","Du hast versehentlich dein Tagebuch veröffentlicht.","Du hast eine wichtige E-Mail an die falsche Person geschickt.","Du kannst keine Türen mehr öffnen.","Dein Name wird ständig falsch ausgesprochen – von allen.","Du hast beim Online-Shopping aus Versehen eine echte Ziege bestellt. Sie kommt morgen.","Du hast beim ersten Date vergessen, wie dein Gegenüber heißt.","Dein sprechender Papagei kennt alle deine Browser-Verläufe und erzählt sie gerade deiner Oma.","Du hast den Geburtstag deines Partners vergessen und stehst jetzt mit leeren Händen vor der Torte.","Deine Eltern wollen TikTok-Stars werden und brauchen dich als Kameramann.","Du bist aus Versehen zum Anführer einer lokalen Gang aus aggressiven Rentnern gewählt worden.","Ein Eichhörnchen hat deinen Autoschlüssel geklaut und benutzt ihn jetzt als Nussknacker.","Du bist in einem Escape Room, aber der Mitarbeiter hat vergessen, dass ihr drin seid.","Deine Stimme klingt seit heute Morgen wie die eines 80-jährigen Rauchers.","Deine Nachbarin denkt, du wärst ein berühmter Schauspieler und will ständig Selfies.","Ein Schwarm Bienen hat dein Auto als neue Königin gewählt und folgt dir überall hin.","Du hast beim Camping vergessen, wo du dein Zelt aufgebaut hast.","Dein Hund hat die Hochzeitsringe gefressen – 2 Stunden vor der Hochzeit.","Deine Katze hat gelernt, die Türklinke zu bedienen und lässt jetzt ständig Fremde rein.","Du hast im Supermarkt einen fremden Einkaufswagen mitgenommen und merkst es erst an der Kasse.","Dein neues Smart Home schließt dich aus, weil es denkt, du bist ein Eindringling.","Du hast beim Pizzabestellen die Adresse vom Nachbarn angegeben – und die Pizza wurde angenommen."];
+        const CRIME_PROBLEMS = ["Ein berühmter Juwelier wurde in seinem eigenen Laden ermordet aufgefunden.","In einer Villa wurde ein Millionär mit einer vergifteten Flasche Wein getötet.","Ein Kunstsammler wurde mit seinem eigenen Exponat erschlagen.","Am Tatort wurde ein blutiges Küchenmesser gefunden – doch die Küche ist blitzblank.","Ein Politiker wurde während einer Live-Übertragung ermordet.","Die Leiche lag im Park, umgeben von roten Rosenblättern.","Ein erfolgreicher Anwalt wurde in seiner Kanzlei erschossen – die Tür war von innen verschlossen.","Bei einem Dinner verschwand ein Gast spurlos.","Ein berühmter Koch wurde mit seinen eigenen Messern getötet.","Ein Wissenschaftler wurde in seinem Labor mit einer tödlichen Substanz getötet.","Die Leiche eines DJs wurde im Club auf dem DJ-Pult gefunden.","Ein Model wurde während einer Modeshow vergiftet.","Ein reicher Erbe starb unter mysteriösen Umständen.","Ein Wachmann wurde tot in einem Museum aufgefunden."];
+        const TOOLS = ["Drei Liter abgelaufene Mayonnaise.","Ein Eimer voll mit flüssigem Glitzer.","Eine Packung Wunderkerzen.","Ein ganzer Block Butter.","Eine Wasserpistole voll mit Katzenpisse.","Angela Merkel, die intensiv nachdenkt.","Ein Rudel Waisenkinder.","Ein G36 Sturmgewehr.","Ein Stapel passiv-aggressiver Haftnotizen.","Ein halber Liter lauwarme Milch","Ein kaputter Regenschirm","Drei Meter Luftpolsterfolie","Eine Tüte Sand","Ein kaputter Taschenrechner","Ein Einhorn-Sticker","Ein quietschender Gummihahn","Ein Eimer kaltes Popcorn","Eine leere Fernbedienung","Ein Löffel aus Holz","Ein kaputtes Smartphone","Ein Helm aus Pappe","Eine Banane mit Gesicht","Ein Glas warme Cola","Ein Schlüssel ohne Schloss","Ein kaputter Ventilator","Eine blinkende Weihnachtskugel","Ein nasser Schwamm","Ein kaputter Kugelschreiber","Ein Plüschtier ohne Kopf","Ein halber Apfel","Eine Rolle Alufolie","Ein leeres Notizbuch","Ein Kaktus im Topf","Eine leere Wasserflasche","Eine alte Zeitung","Ein Löffel voller Honig","Ein zerknülltes Blatt Papier","Ein Stück Kreide","Ein Stück Käse","Ein Glas Marmelade","Ein Haufen Büroklammern","Ein kaputtes Lineal","Ein altes T-Shirt","Ein Plastiklöffel","Ein Gutschein für eine Pizza","Ein aufblasbarer Tyrannosaurus Rex","Ein Motivationstrainer","Ein Kostüm, das dich wie eine Topfpflanze aussehen lässt","Eine 10-stündige Playlist mit Fahrstuhlmusik-Remixen","Ein unendlicher Vorrat an Eiswürfeln","Ein Laserpointer, der ein Bild von dir projiziert","Eine Armee von quietschenden Gummienten","Eine Packung Kaugummi, der nach altem Käse schmeckt","Eine Tüte unsichtbarer Luftballons","Ein Schneemann-Bausatz, der auch im Sommer funktioniert","Ein Paar Flip-Flops","Eine Taucherflasche","Ein Hund mit eigenem Instagram-Account","Ein ferngesteuerter Rasenmäher","Kaffeetassen, mit \"Du schaffst das\" Aufdruck","Ein Nachtsichtgerät für Hunde","Ein Klapprad mit Anhänger","Eine Kiste mit 500 Gummibärchen in Form von Gemüse","Ein Roboterstaubsauger","Ein selbstgebauter Heißluftballon","1000 gelbe Notizzettel","Eine Schwimmnudel","Ein Bluetooth-Lautsprecher in Form einer Ananas","Ein Koffer voller Konfetti-Kanonen","Ein Set mit unsichtbarer Tinte und UV-Lampe","Eine aufblasbare Palme","Ein Set mit 50 verschiedenen Luftballon-Tieren","Ein elektrischer Dosenöffner mit Sprachsteuerung","Eine Popcornmaschine","Eine Tüte mit 100 Wackelaugen in verschiedenen Größen","Ein Set mit 5 verschiedenen Megafonen","Eine Wäscheleine mit automatischem Einzug","Eine Kiste mit 50 Paar Socken","10 verschiedene Türklinken","Ein Wasserkocher mit Bluetooth","Ein elektrischer Handwärmer","50 verschiedene Schlüssel","Ein Schirmständer","Ein ferngesteuerter Segway","Eine Seifenblasenmaschine","Ein Klapp-Esstisch für 20 Personen","Ein Set mit 10 verschiedenen Nudelhölzern"];
+        
+        let customProblems = JSON.parse(localStorage.getItem('chaos_custom_problems') || '[]');
+        let customTools = JSON.parse(localStorage.getItem('chaos_custom_tools') || '[]');
+        let players = JSON.parse(localStorage.getItem('chaos_players') || '[]');
+        let onlyCustomMode = localStorage.getItem('chaos_only_custom') === 'true';
+        let lastProblems = [];
+        let lastTools = [];
+        let allProblems = [...PROBLEMS, ...customProblems];
+        let allTools = [...TOOLS, ...customTools];
+        
+        let currentProblem = "", currentTools = [];
+        let timerInterval = null, timerActive = false;
+        let currentGameMode = "standard";
+        
+        // ==================== MAGIC LINK FUNCTIONS ====================
+        
+        function encodeForUrl(data) {
+            try {
+                const jsonString = JSON.stringify(data);
+                const utf8String = encodeURIComponent(jsonString);
+                const base64 = btoa(utf8String);
+                return base64;
+            } catch (e) {
+                console.error("Encode error:", e);
+                return null;
+            }
+        }
+        
+        function decodeFromUrl(base64) {
+            try {
+                const utf8String = atob(base64);
+                const jsonString = decodeURIComponent(utf8String);
+                return JSON.parse(jsonString);
+            } catch (e) {
+                console.error("Decode error:", e);
+                return null;
+            }
+        }
+        
+        function generateShareLink() {
+            const deckData = {
+                problems: customProblems,
+                tools: customTools
+            };
+            
+            const encoded = encodeForUrl(deckData);
+            if (!encoded) {
+                showToast("Fehler beim Erstellen des Links", true);
+                return null;
+            }
+            
+            const url = new URL(window.location.href);
+            url.searchParams.set('data', encoded);
+            
+            let packName = "Mein Deck";
+            if (customProblems.length + customTools.length > 0) {
+                packName = `${customProblems.length} Probleme, ${customTools.length} Hilfsmittel`;
+            }
+            url.searchParams.set('name', packName);
+            
+            return url.toString();
+        }
+        
+        function shareDeck() {
+            const link = generateShareLink();
+            if (!link) return;
+            
+            // Versuche das native Share-Menü zu öffnen
+            if (navigator.share) {
+                navigator.share({
+                    title: 'CHAOS PITCH - Mein Kartendeck',
+                    text: `Schau dir mein CHAOS PITCH Deck an! ${customProblems.length} Probleme, ${customTools.length} Hilfsmittel.`,
+                    url: link
+                }).catch(err => {
+                    if (err.name !== 'AbortError') {
+                        // Fallback: Link in Zwischenablage kopieren
+                        fallbackCopyLink(link);
+                    }
+                });
+            } else {
+                // Fallback für Geräte ohne Share-API
+                fallbackCopyLink(link);
+            }
+        }
+        
+        function fallbackCopyLink(link) {
+            navigator.clipboard.writeText(link).then(() => {
+                showToast("Link kopiert! Jetzt teilen.", false);
+            }).catch(() => {
+                showToast("Link konnte nicht kopiert werden", true);
+            });
+        }
+        
+        function mergeAndImport(importedProblems, importedTools, packName) {
+            // Zusammenführen (Merge) statt Überschreiben - Duplikate vermeiden
+            const existingProblemsSet = new Set(customProblems);
+            const existingToolsSet = new Set(customTools);
+            
+            let newProblems = [];
+            let newTools = [];
+            
+            for (const p of importedProblems) {
+                if (!existingProblemsSet.has(p)) {
+                    newProblems.push(p);
+                }
+            }
+            
+            for (const t of importedTools) {
+                if (!existingToolsSet.has(t)) {
+                    newTools.push(t);
+                }
+            }
+            
+            if (newProblems.length === 0 && newTools.length === 0) {
+                showToast("Keine neuen Karten zum Importieren", false);
+                return false;
+            }
+            
+            const message = `CHAOS PITCH - Das Partyspiel\n\n✨ Neue Karten: ${newProblems.length} Probleme, ${newTools.length} Hilfsmittel\n\nMöchtest du diese Karten zu deinem Deck hinzufügen?`;
+            
+            if (confirm(message)) {
+                customProblems.push(...newProblems);
+                customTools.push(...newTools);
+                localStorage.setItem('chaos_custom_problems', JSON.stringify(customProblems));
+                localStorage.setItem('chaos_custom_tools', JSON.stringify(customTools));
+                rebuildPools();
+                renderCustomLists();
+                newGame();
+                showToast(`${newProblems.length + newTools.length} neue Karten importiert!`, false);
+                return true;
+            }
+            return false;
+        }
+        
+        async function handleUrlImport() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedData = urlParams.get('data');
+            const packName = urlParams.get('name') || 'Kartenpaket';
+            
+            if (!encodedData) return false;
+            
+            const decodedData = decodeFromUrl(encodedData);
+            if (!decodedData || !decodedData.problems || !decodedData.tools) {
+                console.warn("Ungültige Import-Daten");
+                return false;
+            }
+            
+            const success = mergeAndImport(decodedData.problems, decodedData.tools, packName);
+            
+            if (success) {
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.delete('data');
+                newUrl.searchParams.delete('name');
+                window.history.replaceState({}, '', newUrl.toString());
+            }
+            
+            return success;
+        }
+        
+        // ==================== END MAGIC LINK FUNCTIONS ====================
+        
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastNotification');
+            const toastText = document.getElementById('toastText');
+            toastText.textContent = message;
+            toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+            if(document.body.classList.contains('dark-mode') && !isError) {
+                toast.style.backgroundColor = '#2ecc71';
+                toast.style.color = '#1a1a2e';
+            } else if(isError) {
+                toast.style.backgroundColor = '#dc3545';
+                toast.style.color = 'white';
+            } else {
+                toast.style.backgroundColor = '#28a745';
+                toast.style.color = 'white';
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+        
+        function rebuildPools() {
+            if(onlyCustomMode) {
+                allProblems = [...customProblems];
+                allTools = [...customTools];
+            } else {
+                allProblems = [...PROBLEMS, ...customProblems];
+                allTools = [...TOOLS, ...customTools];
+            }
+        }
+        
+        function triggerConfetti() { confetti({ particleCount: 100, spread: 65, origin: { y: 0.6 } }); }
+        
+        function getRandomProblem() { 
+            let pool = currentGameMode === "crime" ? CRIME_PROBLEMS : allProblems;
+            if(pool.length === 0) return "Keine Probleme verfügbar! Füge eigene hinzu oder deaktiviere 'Nur eigene Karten'.";
+            let available = pool.filter(p => !lastProblems.includes(p));
+            if(available.length === 0) available = [...pool];
+            let chosen = available[Math.floor(Math.random() * available.length)];
+            lastProblems.unshift(chosen);
+            if(lastProblems.length > 5) lastProblems.pop();
+            return chosen;
+        }
+        
+        function getRandomTools(count) { 
+            let pool = [...allTools];
+            if(pool.length === 0) return ["Keine Hilfsmittel verfügbar! Bitte füge eigene hinzu."];
+            let available = pool.filter(t => !lastTools.includes(t));
+            if(available.length < count) available = [...pool];
+            let shuffled = [...available];
+            for (let i = shuffled.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; }
+            let chosen = shuffled.slice(0, count);
+            chosen.forEach(t => { lastTools.unshift(t); if(lastTools.length > 10) lastTools.pop(); });
+            return chosen;
+        }
+        
+        function updateUILabels() {
+            const problemLabel = document.getElementById('problemLabel'), toolsLabel = document.getElementById('toolsLabel'), timerBtn = document.getElementById('timerBtn');
+            if (currentGameMode === "crime") { problemLabel.textContent = "DER FALL"; toolsLabel.innerHTML = '<i class="fas fa-dna"></i> BEWEISMITTEL (nutze sie für deine Ermittlungen)'; }
+            else if (currentGameMode === "speed") { problemLabel.textContent = "DAS PROBLEM"; toolsLabel.innerHTML = '<i class="fas fa-bolt"></i> DEIN HILFSMITTEL (verwende es sofort!)'; }
+            else { problemLabel.textContent = "DAS PROBLEM"; toolsLabel.innerHTML = '<i class="fas fa-tools"></i> DEINE HILFSMITTEL (mindestens 1 verwenden)'; }
+            if (currentGameMode === "speed") timerBtn.classList.remove('timer-hidden');
+            else { timerBtn.classList.add('timer-hidden'); if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } timerActive = false; }
+        }
+        
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardCompact');
+            if(!container) return;
+            const sorted = [...players].sort((a,b)=>b.score - a.score);
+            if(sorted.length === 0) { container.style.display = 'none'; return; }
+            container.style.display = 'flex';
+            const top3 = sorted.slice(0,3);
+            container.innerHTML = top3.map((p,idx)=>{ let medal = idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':''; return `<div class="leaderboard-item"><span class="leaderboard-medal">${medal}</span><span class="leaderboard-name">${escapeHtml(p.name)}</span><span class="leaderboard-score">${p.score}</span></div>`; }).join('');
+        }
+        
+        function renderPlayers() {
+            const container = document.getElementById('playersContainer');
+            if (!container) return;
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            if (sortedPlayers.length === 0) { container.innerHTML = '<div class="empty-list-message"><i class="fas fa-users"></i> Noch keine Spieler vorhanden.</div>'; renderLeaderboard(); return; }
+            container.innerHTML = sortedPlayers.map((p, idx) => { let medalIcon = idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':`${idx+1}.`; return `<div class="player-card"><div style="width:45px;">${medalIcon}</div><span class="player-name">${escapeHtml(p.name)}</span><div class="player-actions"><button class="player-btn minus" data-name="${escapeHtml(p.name)}" data-delta="-1">-</button><span class="player-score">${p.score}</span><button class="player-btn plus" data-name="${escapeHtml(p.name)}" data-delta="1">+</button><button class="player-btn delete" data-name="${escapeHtml(p.name)}"><i class="fas fa-trash"></i></button></div></div>`; }).join('');
+            document.querySelectorAll('.player-btn.plus, .player-btn.minus').forEach(btn => btn.addEventListener('click', () => { const name = btn.dataset.name; const delta = parseInt(btn.dataset.delta); const idx = players.findIndex(p => p.name === name); if(idx!==-1){ players[idx].score = Math.max(0, players[idx].score+delta); localStorage.setItem('chaos_players', JSON.stringify(players)); renderPlayers(); if(delta>0) triggerConfetti(); } }));
+            document.querySelectorAll('.player-btn.delete').forEach(btn => btn.addEventListener('click', () => { const name = btn.dataset.name; players = players.filter(p => p.name !== name); localStorage.setItem('chaos_players', JSON.stringify(players)); renderPlayers(); showToast("Spieler gelöscht", false); }));
+            renderLeaderboard();
+        }
+        
+        function renderCustomLists() {
+            const problemsList = document.getElementById('customProblemsList'), toolsList = document.getElementById('customToolsList');
+            if(problemsList) problemsList.innerHTML = customProblems.map((p,i)=>`<div class="custom-card-item"><span>${escapeHtml(p)}</span><button class="delete-card-btn" data-problem-idx="${i}"><i class="fas fa-trash"></i></button></div>`).join('');
+            if(toolsList) toolsList.innerHTML = customTools.map((t,i)=>`<div class="custom-card-item"><span>${escapeHtml(t)}</span><button class="delete-card-btn" data-tool-idx="${i}"><i class="fas fa-trash"></i></button></div>`).join('');
+            document.querySelectorAll('[data-problem-idx]').forEach(btn => btn.addEventListener('click',()=>{ customProblems.splice(parseInt(btn.dataset.problemIdx),1); localStorage.setItem('chaos_custom_problems',JSON.stringify(customProblems)); rebuildPools(); renderCustomLists(); showToast("Problem gelöscht",false); updateOnlyCustomWarning(); }));
+            document.querySelectorAll('[data-tool-idx]').forEach(btn => btn.addEventListener('click',()=>{ customTools.splice(parseInt(btn.dataset.toolIdx),1); localStorage.setItem('chaos_custom_tools',JSON.stringify(customTools)); rebuildPools(); renderCustomLists(); showToast("Hilfsmittel gelöscht",false); updateOnlyCustomWarning(); }));
+            document.getElementById('customProblemsSection').style.display = customProblems.length ? 'block' : 'none';
+            document.getElementById('customToolsSection').style.display = customTools.length ? 'block' : 'none';
+            updateOnlyCustomWarning();
+        }
+        
+        function updateOnlyCustomWarning() {
+            const warningDiv = document.getElementById('onlyCustomWarning');
+            const statusSpan = document.getElementById('onlyCustomStatus');
+            if(statusSpan) statusSpan.textContent = onlyCustomMode ? "An" : "Aus";
+            if(onlyCustomMode && (customProblems.length < 5 || customTools.length < 10)) {
+                warningDiv.style.display = 'block';
+            } else {
+                warningDiv.style.display = 'none';
+            }
+        }
+        
+        function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }); }
+        
+        function renderTools() {
+            const toolsGrid = document.getElementById('toolsGrid');
+            toolsGrid.innerHTML = currentTools.map((tool,idx)=>`<div class="tool-card"><div class="tool-number">${currentGameMode==="crime"?"BEWEISMITTEL":"HILFSMITTEL"} ${idx+1}</div><div class="tool-desc">${escapeHtml(tool)}</div></div>`).join('');
+            document.querySelectorAll('.tool-card').forEach(card=>card.addEventListener('click',()=>{ card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'),280); showToast(`✨ Nutze: "${card.innerText.slice(0,70)}"`,false); }));
+        }
+        
+        function startTimer(seconds) {
+            if (timerInterval) clearInterval(timerInterval);
+            let timeLeft = seconds;
+            timerActive = true;
+            const timerBtn = document.getElementById('timerBtn'), timerLabel = document.getElementById('timerLabel');
+            timerBtn.classList.add('timer-active'); timerBtn.classList.remove('timer-expired');
+            const update = () => { timerLabel.innerHTML = `<span class="timer-display">${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}</span>`; };
+            update();
+            timerInterval = setInterval(() => { if (timeLeft <= 1) { clearInterval(timerInterval); timerActive=false; timerBtn.classList.remove('timer-active'); timerBtn.classList.add('timer-expired'); timerLabel.innerHTML=`Abgelaufen`; showToast("⏰ Zeit abgelaufen!", false); triggerConfetti(); } else { timeLeft--; update(); } }, 1000);
+        }
+        function handleTimerClick() { if (!timerActive) startTimer(parseInt(document.getElementById('timerDurationSelectModal').value)); else { clearInterval(timerInterval); timerActive=false; document.getElementById('timerBtn').classList.remove('timer-active'); document.getElementById('timerLabel').innerHTML=`Timer starten`; showToast("⏸ Timer gestoppt.", false); } }
+        
+        async function newGame() {
+            const probEl = document.getElementById('problemText'), cards = document.querySelectorAll('.tool-card');
+            cards.forEach(c=>c.classList.add('shuffling')); probEl.classList.add('shuffling');
+            await new Promise(r=>setTimeout(r,380));
+            currentProblem = getRandomProblem();
+            let tools = getRandomTools(3);
+            if(currentGameMode === "speed") tools = [tools[0]];
+            currentTools = tools;
+            probEl.textContent = currentProblem;
+            renderTools();
+            if(timerInterval) clearInterval(timerInterval); timerActive=false;
+            const timerBtn = document.getElementById('timerBtn'); timerBtn.classList.remove('timer-active','timer-expired'); document.getElementById('timerLabel').innerHTML=`Timer starten`;
+            
+            if(currentGameMode === "speed") { 
+                startTimer(parseInt(document.getElementById('timerDurationSelectModal').value)); 
+                showToast(`⚡ Speed-Pitch! Die Zeit läuft!`, false); 
+            }
+            else if(currentGameMode === "crime") {
+                showToast("🔪 Crime-Pitch! Löse den Fall!", false);
+            }
+            
+            document.querySelector('.game-card').classList.add('new-round'); setTimeout(()=>document.querySelector('.game-card').classList.remove('new-round'),420);
+            cards.forEach(c=>c.classList.remove('shuffling')); probEl.classList.remove('shuffling');
+        }
+        
+        function exportDecks() { const data = { customProblems, customTools }; const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "chaos_pitch_deck.json"; a.click(); URL.revokeObjectURL(a.href); showToast("Deck exportiert!", false); }
+        function importDecks(file) { const reader = new FileReader(); reader.onload = e => { try { const json = JSON.parse(e.target.result); if(json.customProblems && json.customTools) { const newProblems = [...new Set([...customProblems, ...json.customProblems])]; const newTools = [...new Set([...customTools, ...json.customTools])]; const addedProblems = newProblems.length - customProblems.length; const addedTools = newTools.length - customTools.length; customProblems = newProblems; customTools = newTools; localStorage.setItem('chaos_custom_problems', JSON.stringify(customProblems)); localStorage.setItem('chaos_custom_tools', JSON.stringify(customTools)); rebuildPools(); renderCustomLists(); showToast(`${addedProblems + addedTools} neue Karten importiert!`, false); } else { showToast("Ungültiges Dateiformat", true); } } catch(ex){ showToast("Fehler beim Import", true); } }; reader.readAsText(file); }
+        
+        function toggleOnlyCustomMode() {
+            const checkbox = document.getElementById('onlyCustomCardsToggle');
+            onlyCustomMode = checkbox.checked;
+            localStorage.setItem('chaos_only_custom', onlyCustomMode);
+            rebuildPools();
+            updateOnlyCustomWarning();
+            newGame();
+            if(onlyCustomMode && (customProblems.length < 5 || customTools.length < 10)) {
+                showToast("Hinweis: Für 'Nur eigene Karten' bitte mindestens 5 Probleme & 10 Hilfsmittel anlegen.", false);
+            }
+        }
+        
+        function resetAllData() {
+            if (confirm("⚠️ ACHTUNG! Dies löscht ALLE Daten:\n- Alle Spieler und Punkte\n- Alle eigenen Probleme\n- Alle eigenen Hilfsmittel\n- Alle Einstellungen\n\nDies kann NICHT rückgängig gemacht werden!\n\nWirklich alles zurücksetzen?")) {
+                localStorage.clear();
+                customProblems = [];
+                customTools = [];
+                players = [];
+                onlyCustomMode = false;
+                lastProblems = [];
+                lastTools = [];
+                allProblems = [...PROBLEMS];
+                allTools = [...TOOLS];
+                rebuildPools();
+                renderPlayers();
+                renderCustomLists();
+                updateOnlyCustomWarning();
+                newGame();
+                showToast("Alle Daten wurden gelöscht!", false);
+                const darkModeSwitch = document.getElementById('darkModeSwitch');
+                if(darkModeSwitch) darkModeSwitch.checked = false;
+                document.body.classList.remove('dark-mode');
+                if(document.getElementById('darkModeStatus')) document.getElementById('darkModeStatus').textContent = "Aus";
+                const onlyCustomCheck = document.getElementById('onlyCustomCardsToggle');
+                if(onlyCustomCheck) onlyCustomCheck.checked = false;
+            }
+        }
+        
+        function initDarkMode() {
+            const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
+            const darkModeSwitch = document.getElementById('darkModeSwitch');
+            const darkModeStatus = document.getElementById('darkModeStatus');
+            if(darkModeEnabled) {
+                document.body.classList.add('dark-mode');
+                if(darkModeSwitch) darkModeSwitch.checked = true;
+                if(darkModeStatus) darkModeStatus.textContent = "An";
+            } else {
+                if(darkModeSwitch) darkModeSwitch.checked = false;
+                if(darkModeStatus) darkModeStatus.textContent = "Aus";
+            }
+        }
+        
+        function toggleDarkMode() {
+            const darkModeSwitch = document.getElementById('darkModeSwitch');
+            const darkModeStatus = document.getElementById('darkModeStatus');
+            if(darkModeSwitch.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+                if(darkModeStatus) darkModeStatus.textContent = "An";
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+                if(darkModeStatus) darkModeStatus.textContent = "Aus";
+            }
+        }
+        
+        document.getElementById('exportCardsBtn')?.addEventListener('click', exportDecks);
+        document.getElementById('shareDeckBtn')?.addEventListener('click', shareDeck);
+        document.getElementById('importCardsFile')?.addEventListener('change', e => { if(e.target.files[0]) importDecks(e.target.files[0]); e.target.value=''; });
+        document.getElementById('addPlayerBtn')?.addEventListener('click',()=>{ const name = document.getElementById('newPlayerName').value.trim(); if(!name) return showToast("Bitte Namen",true); if(players.some(p=>p.name===name)) return showToast("Existiert",true); players.push({name,score:0}); localStorage.setItem('chaos_players',JSON.stringify(players)); renderPlayers(); document.getElementById('newPlayerName').value=''; showToast(`Spieler ${name} hinzugefügt`,false); });
+        document.getElementById('addProblemBtn')?.addEventListener('click',()=>{ const v = document.getElementById('customProblem').value.trim(); if(!v) return; customProblems.push(v); localStorage.setItem('chaos_custom_problems',JSON.stringify(customProblems)); rebuildPools(); document.getElementById('customProblem').value=''; renderCustomLists(); showToast("Problem hinzugefügt",false); });
+        document.getElementById('addToolBtn')?.addEventListener('click',()=>{ const v = document.getElementById('customTool').value.trim(); if(!v) return; customTools.push(v); localStorage.setItem('chaos_custom_tools',JSON.stringify(customTools)); rebuildPools(); document.getElementById('customTool').value=''; renderCustomLists(); showToast("Hilfsmittel hinzugefügt",false); });
+        document.querySelectorAll('.mode-option').forEach(opt=>opt.addEventListener('click',()=>{ document.querySelectorAll('.mode-option').forEach(o=>o.classList.remove('active')); opt.classList.add('active'); currentGameMode=opt.dataset.mode; updateUILabels(); newGame(); }));
+        
+        document.getElementById('timerBtn')?.addEventListener('click', handleTimerClick);
+        document.getElementById('newGameBtn')?.addEventListener('click', newGame);
+        document.getElementById('openScoreModalBtn')?.addEventListener('click',()=>{ renderPlayers(); document.getElementById('scoreModal').style.display='flex'; });
+        document.getElementById('openCustomModalBtn')?.addEventListener('click',()=>{ renderCustomLists(); document.getElementById('customModal').style.display='flex'; });
+        document.querySelectorAll('.close-score-modal, .close-custom-modal').forEach(btn=>btn.addEventListener('click',()=>{ document.getElementById('scoreModal').style.display='none'; document.getElementById('customModal').style.display='none'; }));
+        document.getElementById('settingsLink')?.addEventListener('click',()=>document.getElementById('settingsModal').style.display='flex');
+        document.getElementById('privacyLink')?.addEventListener('click',()=>document.getElementById('privacyModal').style.display='flex');
+        document.getElementById('closeSettingsModal')?.addEventListener('click',()=>document.getElementById('settingsModal').style.display='none');
+        document.getElementById('closePrivacyModal')?.addEventListener('click',()=>document.getElementById('privacyModal').style.display='none');
+        document.getElementById('resetAllBtn')?.addEventListener('click', resetAllData);
+        
+        const onlyCustomCheckbox = document.getElementById('onlyCustomCardsToggle');
+        if(onlyCustomCheckbox) {
+            onlyCustomCheckbox.checked = onlyCustomMode;
+            onlyCustomCheckbox.addEventListener('change', toggleOnlyCustomMode);
+        }
+        
+        const darkModeSwitch = document.getElementById('darkModeSwitch');
+        if(darkModeSwitch) {
+            darkModeSwitch.addEventListener('change', toggleDarkMode);
+        }
+        
+        window.addEventListener('click',(e)=>{ if(e.target.classList.contains('modal')) e.target.style.display='none'; });
+        
+        window.addEventListener('load', async () => {
+            rebuildPools();
+            renderPlayers();
+            renderCustomLists();
+            initDarkMode();
+            updateUILabels();
+            newGame();
+            updateOnlyCustomWarning();
+            await handleUrlImport();
+        });
+    </script>
+</body>
+</html>
