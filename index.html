@@ -1073,20 +1073,24 @@
             .input-group button { width: auto; }
             .modal-content { padding: 20px; }
             
-            /* Mobile: Spieler-Card - einfaches Layout ohne Rangnummer */
+            /* Mobile: Spieler-Card mit Medal neben Namen */
             .player-card { 
-                display: flex;
-                justify-content: space-between;
+                display: grid;
+                grid-template-columns: auto 1fr auto;
                 align-items: center;
-                flex-wrap: wrap;
                 gap: 10px;
                 padding: 12px 16px;
             }
+            .player-card > div:first-child { 
+                width: auto;
+                font-size: 1.3rem;
+            }
             .player-name { 
                 text-align: left;
-                flex: 1;
+                min-width: 0;
             }
             .player-actions { 
+                grid-column: 3;
                 display: flex;
                 gap: 8px;
             }
@@ -1106,39 +1110,16 @@
                 flex-shrink: 0;
             }
             
-            /* Free Notice auf Mobile: Icon ausblenden, Text auf zwei Zeilen */
-            .free-notice i {
-                display: none;
-            }
+            /* Free Notice auf Mobile kleiner für 2 Zeilen */
             .free-notice {
                 font-size: 0.7rem;
-                padding: 12px 8px;
-                gap: 0;
+                padding: 14px 12px;
+                gap: 8px;
                 flex-wrap: wrap;
-                text-align: center;
-                line-height: 1.4;
             }
-            .free-notice span {
-                white-space: normal;
-                display: inline-block;
+            .free-notice i {
+                font-size: 1rem;
             }
-            
-            /* Import/Export Buttons gleich groß machen */
-            .import-export-bar .share-link-btn,
-            .import-export-bar .mini-menu-btn,
-            .import-export-bar label.mini-menu-btn {
-                padding: 10px 16px;
-                font-size: 0.8rem;
-                width: auto;
-                display: inline-flex;
-                justify-content: center;
-                min-width: 130px;
-            }
-        }
-        
-        /* Desktop: Spieler-Card ohne Rangnummer */
-        .player-rank {
-            display: none;
         }
         
         .new-round { animation: fadeIn 0.4s ease-out; }
@@ -1607,10 +1588,7 @@
             if (!container) return;
             const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
             if (sortedPlayers.length === 0) { container.innerHTML = '<div class="empty-list-message"><i class="fas fa-users"></i> Noch keine Spieler vorhanden.</div>'; renderLeaderboard(); return; }
-            // Nur Namen und Punkte, ohne Rangnummer oder Medaillen
-            container.innerHTML = sortedPlayers.map((p, idx) => { 
-                return `<div class="player-card"><span class="player-name">${escapeHtml(p.name)}</span><div class="player-actions"><button class="player-btn minus" data-name="${escapeHtml(p.name)}" data-delta="-1">-</button><span class="player-score">${p.score}</span><button class="player-btn plus" data-name="${escapeHtml(p.name)}" data-delta="1">+</button><button class="player-btn delete" data-name="${escapeHtml(p.name)}"><i class="fas fa-trash"></i></button></div></div>`;
-            }).join('');
+            container.innerHTML = sortedPlayers.map((p, idx) => { let medalIcon = idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':''; return `<div class="player-card"><div>${medalIcon}</div><span class="player-name">${escapeHtml(p.name)}</span><div class="player-actions"><button class="player-btn minus" data-name="${escapeHtml(p.name)}" data-delta="-1">-</button><span class="player-score">${p.score}</span><button class="player-btn plus" data-name="${escapeHtml(p.name)}" data-delta="1">+</button><button class="player-btn delete" data-name="${escapeHtml(p.name)}"><i class="fas fa-trash"></i></button></div></div>`; }).join('');
             document.querySelectorAll('.player-btn.plus, .player-btn.minus').forEach(btn => btn.addEventListener('click', () => { const name = btn.dataset.name; const delta = parseInt(btn.dataset.delta); const idx = players.findIndex(p => p.name === name); if(idx!==-1){ players[idx].score = Math.max(0, players[idx].score+delta); localStorage.setItem('chaos_players', JSON.stringify(players)); renderPlayers(); if(delta>0) triggerConfetti(); } }));
             document.querySelectorAll('.player-btn.delete').forEach(btn => btn.addEventListener('click', () => { const name = btn.dataset.name; players = players.filter(p => p.name !== name); localStorage.setItem('chaos_players', JSON.stringify(players)); renderPlayers(); showToast("Spieler gelöscht", false); }));
             renderLeaderboard();
@@ -1771,15 +1749,6 @@
         document.getElementById('closePrivacyModal')?.addEventListener('click',()=>document.getElementById('privacyModal').style.display='none');
         document.getElementById('resetAllBtn')?.addEventListener('click', resetAllData);
         
-        // Schließe Modals durch Klick auf den Hintergrund (Mobile und Desktop)
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        });
-        
         const onlyCustomCheckbox = document.getElementById('onlyCustomCardsToggle');
         if(onlyCustomCheckbox) {
             onlyCustomCheckbox.checked = onlyCustomMode;
@@ -1790,6 +1759,8 @@
         if(darkModeSwitch) {
             darkModeSwitch.addEventListener('change', toggleDarkMode);
         }
+        
+        window.addEventListener('click',(e)=>{ if(e.target.classList.contains('modal')) e.target.style.display='none'; });
         
         window.addEventListener('load', async () => {
             rebuildPools();
