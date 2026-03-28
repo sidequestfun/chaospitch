@@ -41,7 +41,6 @@
             min-height: 100vh;
         }
         
-        /* Dark Mode - angepasste Farben für bessere Lesbarkeit */
         body.dark-mode {
             background-color: #12121a;
             color: #eef2ff;
@@ -221,7 +220,6 @@
             transition: all 0.2s ease;
         }
         
-        /* Logo größer gemacht */
         .logo-img {
             height: 108px;
             width: auto;
@@ -257,7 +255,6 @@
             color: #ffffff;
         }
         
-        /* Tagline kleiner als Titel, für Mobile eine Zeile */
         .tagline {
             font-size: 0.9rem;
             color: #5a5a6e;
@@ -851,7 +848,6 @@
             transform: translateY(-2px);
         }
         
-        /* Switch Toggle Style */
         .switch {
             position: relative;
             display: inline-block;
@@ -903,7 +899,6 @@
             gap: 12px;
         }
         
-        /* Hellgrauer Hinweis für Einstellungen */
         .settings-warning-hint {
             background-color: #f0f0f5;
             padding: 12px 16px;
@@ -1014,7 +1009,6 @@
             color: #b0b0c8;
         }
         
-        /* Einheitliche Button-Stile */
         .btn-add {
             background-color: #DD467F;
             color: white;
@@ -1037,10 +1031,6 @@
             box-shadow: 0 6px 12px rgba(221, 70, 127, 0.3);
         }
         
-        .add-button-rounded {
-            border-radius: 50px !important;
-        }
-        
         .input-group {
             display: flex;
             gap: 10px;
@@ -1055,7 +1045,6 @@
             font-size: 1rem;
         }
         
-        /* Mobile Anpassungen */
         @media (max-width: 700px) {
             .container { padding: 15px; }
             h1 { font-size: 1.5rem; white-space: normal; text-align: center; }
@@ -1072,10 +1061,7 @@
             .btn-add { padding: 10px 16px; }
             .btn-add i { margin: 0; }
             .input-group { flex-wrap: wrap; }
-            .input-group button { width: auto; }
             .modal-content { padding: 20px; }
-            
-            /* Mobile: Spieler-Card mit Medal neben Namen */
             .player-card { 
                 display: grid;
                 grid-template-columns: auto 1fr auto;
@@ -1096,8 +1082,6 @@
                 display: flex;
                 gap: 8px;
             }
-            
-            /* Mobile: Settings Row - Switches und Buttons rechts vom Text */
             .settings-row { 
                 flex-direction: row;
                 justify-content: space-between;
@@ -1108,19 +1092,11 @@
                 width: auto;
                 min-width: 120px;
             }
-            .settings-row .switch-label {
-                flex-shrink: 0;
-            }
-            
-            /* Free Notice auf Mobile kleiner für 2 Zeilen */
             .free-notice {
                 font-size: 0.7rem;
                 padding: 14px 12px;
                 gap: 8px;
                 flex-wrap: wrap;
-            }
-            .free-notice i {
-                font-size: 1rem;
             }
         }
         
@@ -1188,15 +1164,11 @@
         <div class="card info-card">
             <h2>So wird's gespielt</h2>
             <p>Du bekommst ein Problem und 3 Hilfsmittel. Erfinde eine kreative Lösung – mindestens eines der Hilfsmittel muss vorkommen! Je absurder, desto besser. Die Gruppe kürt den besten Pitch.</p>
-            
             <h3>⚡ Speed-Mode</h3>
             <p>Kein langes Überlegen! Du hast nur 20 Sekunden Zeit, um ein einziges Hilfsmittel in eine rettende Idee zu verwandeln. Leg sofort los, bevor der Timer abläuft!</p>
-            
             <h3>🔪 Crime-Mode</h3>
             <p>Werde zum Ermittler an einem mysteriösen Tatort. Nutze die drei gefundenen Beweismittel, um zu erklären, was hier wirklich passiert ist.</p>
-            
             <hr class="divider">
-            
             <h3>Warum CHAOS PITCH?</h3>
             <p>Hier zählt spontane Kreativität, schwarzer Humor und die Fähigkeit, aus drei nutzlosen Gegenständen einen genialen Rettungsplan zu zaubern. Keine zwei Runden sind gleich – und du entdeckst die versteckten Comedy-Talente deiner Freunde.</p>
         </div>
@@ -1225,7 +1197,6 @@
         <a class="footer-link" id="privacyLink"><i class="fas fa-shield-alt"></i> Datenschutz</a>
     </div>
     
-    <!-- Toast Notification oben rechts -->
     <div id="toastNotification" class="notification-toast">
         <i class="fas fa-info-circle"></i>
         <span id="toastText"></span>
@@ -1315,6 +1286,16 @@
                     </label>
                 </div>
                 <div class="settings-row">
+                    <span><i class="fas fa-volume-up"></i> Soundeffekte</span>
+                    <label class="switch-label">
+                        <span style="margin-right: 8px; font-size: 0.85rem; color: #888;" id="soundStatus">An</span>
+                        <label class="switch">
+                            <input type="checkbox" id="soundToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <div class="settings-row">
                     <span><i class="fas fa-stopwatch"></i> Speed-Pitch Dauer</span>
                     <select id="timerDurationSelectModal">
                         <option value="10">10 Sekunden</option>
@@ -1350,6 +1331,139 @@
     </div>
     
     <script>
+        // ==================== SOUND MANAGER ====================
+        class SoundManager {
+            constructor() {
+                this.soundsEnabled = localStorage.getItem('chaos_sounds_enabled') !== 'false';
+                this.audioContext = null;
+                this.initAudioContext();
+                this.updateStatusDisplay();
+            }
+            
+            initAudioContext() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch(e) {
+                    console.warn("Web Audio API not supported");
+                    this.audioContext = null;
+                }
+            }
+            
+            // Tick-Sound - wird schneller je weniger Zeit übrig ist
+            playTick(remainingSeconds) {
+                if (!this.isEnabled() || !this.audioContext) return;
+                const intensity = Math.max(0.2, Math.min(1, (11 - remainingSeconds) / 10));
+                const frequency = 600 + (intensity * 400);
+                const volume = 0.12 * intensity;
+                this.playBeep(frequency, 0.07, volume);
+            }
+            
+            // Leiserer Buzzer am Ende
+            playBuzzer() {
+                if (!this.isEnabled() || !this.audioContext) return;
+                const now = this.audioContext.currentTime;
+                const osc = this.audioContext.createOscillator();
+                const gain = this.audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(this.audioContext.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.value = 180;
+                gain.gain.value = 0.22;
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.00001, now + 1.0);
+                osc.stop(now + 1.0);
+                
+                const osc2 = this.audioContext.createOscillator();
+                const gain2 = this.audioContext.createGain();
+                osc2.connect(gain2);
+                gain2.connect(this.audioContext.destination);
+                osc2.type = 'square';
+                osc2.frequency.value = 90;
+                gain2.gain.value = 0.14;
+                osc2.start(now + 0.05);
+                gain2.gain.exponentialRampToValueAtTime(0.00001, now + 0.9);
+                osc2.stop(now + 0.9);
+            }
+            
+            playSuccess() {
+                if (!this.isEnabled() || !this.audioContext) return;
+                const now = this.audioContext.currentTime;
+                const osc1 = this.audioContext.createOscillator();
+                const gain1 = this.audioContext.createGain();
+                osc1.connect(gain1);
+                gain1.connect(this.audioContext.destination);
+                osc1.type = 'sine';
+                osc1.frequency.value = 523.25;
+                gain1.gain.value = 0.25;
+                osc1.start();
+                gain1.gain.exponentialRampToValueAtTime(0.00001, now + 0.4);
+                osc1.stop(now + 0.4);
+                
+                const osc2 = this.audioContext.createOscillator();
+                const gain2 = this.audioContext.createGain();
+                osc2.connect(gain2);
+                gain2.connect(this.audioContext.destination);
+                osc2.type = 'sine';
+                osc2.frequency.value = 659.25;
+                gain2.gain.value = 0.25;
+                osc2.start(now + 0.15);
+                gain2.gain.exponentialRampToValueAtTime(0.00001, now + 0.55);
+                osc2.stop(now + 0.55);
+                
+                const osc3 = this.audioContext.createOscillator();
+                const gain3 = this.audioContext.createGain();
+                osc3.connect(gain3);
+                gain3.connect(this.audioContext.destination);
+                osc3.type = 'sine';
+                osc3.frequency.value = 783.99;
+                gain3.gain.value = 0.3;
+                osc3.start(now + 0.3);
+                gain3.gain.exponentialRampToValueAtTime(0.00001, now + 0.7);
+                osc3.stop(now + 0.7);
+            }
+            
+            playBeep(frequency, duration = 0.1, volume = 0.15) {
+                if (!this.isEnabled() || !this.audioContext) return;
+                const now = this.audioContext.currentTime;
+                const osc = this.audioContext.createOscillator();
+                const gain = this.audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(this.audioContext.destination);
+                osc.type = 'sine';
+                osc.frequency.value = frequency;
+                gain.gain.value = volume;
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.00001, now + duration);
+                osc.stop(now + duration);
+            }
+            
+            isEnabled() {
+                return this.soundsEnabled;
+            }
+            
+            setEnabled(enabled) {
+                this.soundsEnabled = enabled;
+                localStorage.setItem('chaos_sounds_enabled', enabled);
+                this.updateStatusDisplay();
+                if (enabled && this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+            }
+            
+            updateStatusDisplay() {
+                const statusSpan = document.getElementById('soundStatus');
+                if (statusSpan) statusSpan.textContent = this.soundsEnabled ? "An" : "Aus";
+            }
+            
+            resumeContext() {
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+            }
+        }
+        
+        const soundManager = new SoundManager();
+        
         const PROBLEMS = ["Dein Friseur hat dir versehentlich eine Glatze geschnitten.","Du hast 2 kg Brokkoli bestellt, aber 200 kg geliefert bekommen.","Deine Schwiegermutter zieht für \"unbestimmte Zeit\" in dein Gästezimmer.","Du hast aus Versehen \"Ich liebe dich\" am Ende eines Vorstellungsgesprächs gesagt.","Deine einzige Hose ist im Schritt gerissen – 5 Minuten vor einer wichtigen Präsentation.","Deine Kinder haben die Wände mit Permanentmarker verziert.","Dein Handy fällt ins Klo während eines Dates.","Du hast aus Versehen deinem Chef \"Ich liebe dich\" geschrieben.","Du sitzt im falschen Flugzeug und merkst es erst in der Luft.","Du hast dein Passwort überall gleich – und es wurde gehackt.","Dein Name wurde offiziell falsch im Pass eingetragen.","Dein Lieblingsessen schmeckt plötzlich nach Seife.","Du hast versehentlich dein Tagebuch veröffentlicht.","Du hast eine wichtige E-Mail an die falsche Person geschickt.","Du kannst keine Türen mehr öffnen.","Dein Name wird ständig falsch ausgesprochen – von allen.","Du hast beim Online-Shopping aus Versehen eine echte Ziege bestellt. Sie kommt morgen.","Du hast beim ersten Date vergessen, wie dein Gegenüber heißt.","Dein sprechender Papagei kennt alle deine Browser-Verläufe und erzählt sie gerade deiner Oma.","Du hast den Geburtstag deines Partners vergessen und stehst jetzt mit leeren Händen vor der Torte.","Deine Eltern wollen TikTok-Stars werden und brauchen dich als Kameramann.","Du bist aus Versehen zum Anführer einer lokalen Gang aus aggressiven Rentnern gewählt worden.","Ein Eichhörnchen hat deinen Autoschlüssel geklaut und benutzt ihn jetzt als Nussknacker.","Du bist in einem Escape Room, aber der Mitarbeiter hat vergessen, dass ihr drin seid.","Deine Stimme klingt seit heute Morgen wie die eines 80-jährigen Rauchers.","Deine Nachbarin denkt, du wärst ein berühmter Schauspieler und will ständig Selfies.","Ein Schwarm Bienen hat dein Auto als neue Königin gewählt und folgt dir überall hin.","Du hast beim Camping vergessen, wo du dein Zelt aufgebaut hast.","Dein Hund hat die Hochzeitsringe gefressen – 2 Stunden vor der Hochzeit.","Deine Katze hat gelernt, die Türklinke zu bedienen und lässt jetzt ständig Fremde rein.","Du hast im Supermarkt einen fremden Einkaufswagen mitgenommen und merkst es erst an der Kasse.","Dein neues Smart Home schließt dich aus, weil es denkt, du bist ein Eindringling.","Du hast beim Pizzabestellen die Adresse vom Nachbarn angegeben – und die Pizza wurde angenommen."];
         const CRIME_PROBLEMS = ["Ein berühmter Juwelier wurde in seinem eigenen Laden ermordet aufgefunden.","In einer Villa wurde ein Millionär mit einer vergifteten Flasche Wein getötet.","Ein Kunstsammler wurde mit seinem eigenen Exponat erschlagen.","Am Tatort wurde ein blutiges Küchenmesser gefunden – doch die Küche ist blitzblank.","Ein Politiker wurde während einer Live-Übertragung ermordet.","Die Leiche lag im Park, umgeben von roten Rosenblättern.","Ein erfolgreicher Anwalt wurde in seiner Kanzlei erschossen – die Tür war von innen verschlossen.","Bei einem Dinner verschwand ein Gast spurlos.","Ein berühmter Koch wurde mit seinen eigenen Messern getötet.","Ein Wissenschaftler wurde in seinem Labor mit einer tödlichen Substanz getötet.","Die Leiche eines DJs wurde im Club auf dem DJ-Pult gefunden.","Ein Model wurde während einer Modeshow vergiftet.","Ein reicher Erbe starb unter mysteriösen Umständen.","Ein Wachmann wurde tot in einem Museum aufgefunden."];
         const TOOLS = ["Drei Liter abgelaufene Mayonnaise.","Ein Eimer voll mit flüssigem Glitzer.","Eine Packung Wunderkerzen.","Ein ganzer Block Butter.","Eine Wasserpistole voll mit Katzenpisse.","Angela Merkel, die intensiv nachdenkt.","Ein Rudel Waisenkinder.","Ein G36 Sturmgewehr.","Ein Stapel passiv-aggressiver Haftnotizen.","Ein halber Liter lauwarme Milch","Ein kaputter Regenschirm","Drei Meter Luftpolsterfolie","Eine Tüte Sand","Ein kaputter Taschenrechner","Ein Einhorn-Sticker","Ein quietschender Gummihahn","Ein Eimer kaltes Popcorn","Eine leere Fernbedienung","Ein Löffel aus Holz","Ein kaputtes Smartphone","Ein Helm aus Pappe","Eine Banane mit Gesicht","Ein Glas warme Cola","Ein Schlüssel ohne Schloss","Ein kaputter Ventilator","Eine blinkende Weihnachtskugel","Ein nasser Schwamm","Ein kaputter Kugelschreiber","Ein Plüschtier ohne Kopf","Ein halber Apfel","Eine Rolle Alufolie","Ein leeres Notizbuch","Ein Kaktus im Topf","Eine leere Wasserflasche","Eine alte Zeitung","Ein Löffel voller Honig","Ein zerknülltes Blatt Papier","Ein Stück Kreide","Ein Stück Käse","Ein Glas Marmelade","Ein Haufen Büroklammern","Ein kaputtes Lineal","Ein altes T-Shirt","Ein Plastiklöffel","Ein Gutschein für eine Pizza","Ein aufblasbarer Tyrannosaurus Rex","Ein Motivationstrainer","Ein Kostüm, das dich wie eine Topfpflanze aussehen lässt","Eine 10-stündige Playlist mit Fahrstuhlmusik-Remixen","Ein unendlicher Vorrat an Eiswürfeln","Ein Laserpointer, der ein Bild von dir projiziert","Eine Armee von quietschenden Gummienten","Eine Packung Kaugummi, der nach altem Käse schmeckt","Eine Tüte unsichtbarer Luftballons","Ein Schneemann-Bausatz, der auch im Sommer funktioniert","Ein Paar Flip-Flops","Eine Taucherflasche","Ein Hund mit eigenem Instagram-Account","Ein ferngesteuerter Rasenmäher","Kaffeetassen, mit \"Du schaffst das\" Aufdruck","Ein Nachtsichtgerät für Hunde","Ein Klapprad mit Anhänger","Eine Kiste mit 500 Gummibärchen in Form von Gemüse","Ein Roboterstaubsauger","Ein selbstgebauter Heißluftballon","1000 gelbe Notizzettel","Eine Schwimmnudel","Ein Bluetooth-Lautsprecher in Form einer Ananas","Ein Koffer voller Konfetti-Kanonen","Ein Set mit unsichtbarer Tinte und UV-Lampe","Eine aufblasbare Palme","Ein Set mit 50 verschiedenen Luftballon-Tieren","Ein elektrischer Dosenöffner mit Sprachsteuerung","Eine Popcornmaschine","Eine Tüte mit 100 Wackelaugen in verschiedenen Größen","Ein Set mit 5 verschiedenen Megafonen","Eine Wäscheleine mit automatischem Einzug","Eine Kiste mit 50 Paar Socken","10 verschiedene Türklinken","Ein Wasserkocher mit Bluetooth","Ein elektrischer Handwärmer","50 verschiedene Schlüssel","Ein Schirmständer","Ein ferngesteuerter Segway","Eine Seifenblasenmaschine","Ein Klapp-Esstisch für 20 Personen","Ein Set mit 10 verschiedenen Nudelhölzern"];
@@ -1367,29 +1481,19 @@
         let timerInterval = null, timerActive = false;
         let currentGameMode = "standard";
         
-        // ==================== LZ-STRING KOMPRIMIERTE MAGIC LINK FUNCTIONS ====================
-        
         function generateShareLink() {
-            const deckData = {
-                problems: customProblems,
-                tools: customTools
-            };
-            
+            const deckData = { problems: customProblems, tools: customTools };
             try {
-                // Komprimiere den JSON-String direkt in ein URL-sicheres Format
                 const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(deckData));
                 const url = new URL(window.location.href);
                 url.searchParams.set('data', compressed);
-                
                 let packName = "Mein Deck";
                 if (customProblems.length + customTools.length > 0) {
                     packName = `${customProblems.length} Probleme, ${customTools.length} Hilfsmittel`;
                 }
                 url.searchParams.set('name', packName);
-                
                 return url.toString();
             } catch (e) {
-                console.error("LZ-String Fehler:", e);
                 showToast("Fehler beim Erstellen des Links", true);
                 return null;
             }
@@ -1398,64 +1502,27 @@
         function shareDeck() {
             const link = generateShareLink();
             if (!link) return;
-            
             if (navigator.share) {
-                navigator.share({
-                    title: 'CHAOS PITCH - Mein Kartendeck',
-                    text: `Schau dir mein CHAOS PITCH Deck an! ${customProblems.length} Probleme, ${customTools.length} Hilfsmittel.`,
-                    url: link
-                }).catch(err => {
-                    if (err.name !== 'AbortError') {
-                        fallbackCopyLink(link);
-                    }
-                });
-            } else {
-                fallbackCopyLink(link);
-            }
+                navigator.share({ title: 'CHAOS PITCH - Mein Kartendeck', text: `Schau dir mein CHAOS PITCH Deck an! ${customProblems.length} Probleme, ${customTools.length} Hilfsmittel.`, url: link }).catch(err => { if (err.name !== 'AbortError') fallbackCopyLink(link); });
+            } else { fallbackCopyLink(link); }
         }
         
         function fallbackCopyLink(link) {
-            navigator.clipboard.writeText(link).then(() => {
-                showToast("Link kopiert! Jetzt teilen.", false);
-            }).catch(() => {
-                showToast("Link konnte nicht kopiert werden", true);
-            });
+            navigator.clipboard.writeText(link).then(() => showToast("Link kopiert! Jetzt teilen.", false)).catch(() => showToast("Link konnte nicht kopiert werden", true));
         }
         
         function mergeAndImport(importedProblems, importedTools, packName) {
             const existingProblemsSet = new Set(customProblems);
             const existingToolsSet = new Set(customTools);
-            
-            let newProblems = [];
-            let newTools = [];
-            
-            for (const p of importedProblems) {
-                if (!existingProblemsSet.has(p)) {
-                    newProblems.push(p);
-                }
-            }
-            
-            for (const t of importedTools) {
-                if (!existingToolsSet.has(t)) {
-                    newTools.push(t);
-                }
-            }
-            
-            if (newProblems.length === 0 && newTools.length === 0) {
-                showToast("Keine neuen Karten zum Importieren", false);
-                return false;
-            }
-            
-            const message = `CHAOS PITCH - Das Partyspiel\n\n✨ Neue Karten: ${newProblems.length} Probleme, ${newTools.length} Hilfsmittel\n\nMöchtest du diese Karten zu deinem Deck hinzufügen?`;
-            
-            if (confirm(message)) {
-                customProblems.push(...newProblems);
-                customTools.push(...newTools);
+            let newProblems = [], newTools = [];
+            for (const p of importedProblems) if (!existingProblemsSet.has(p)) newProblems.push(p);
+            for (const t of importedTools) if (!existingToolsSet.has(t)) newTools.push(t);
+            if (newProblems.length === 0 && newTools.length === 0) { showToast("Keine neuen Karten zum Importieren", false); return false; }
+            if (confirm(`CHAOS PITCH - Das Partyspiel\n\n✨ Neue Karten: ${newProblems.length} Probleme, ${newTools.length} Hilfsmittel\n\nMöchtest du diese Karten zu deinem Deck hinzufügen?`)) {
+                customProblems.push(...newProblems); customTools.push(...newTools);
                 localStorage.setItem('chaos_custom_problems', JSON.stringify(customProblems));
                 localStorage.setItem('chaos_custom_tools', JSON.stringify(customTools));
-                rebuildPools();
-                renderCustomLists();
-                newGame();
+                rebuildPools(); renderCustomLists(); newGame();
                 showToast(`${newProblems.length + newTools.length} neue Karten importiert!`, false);
                 return true;
             }
@@ -1465,85 +1532,32 @@
         async function handleUrlImport() {
             const urlParams = new URLSearchParams(window.location.search);
             const compressedData = urlParams.get('data');
-            const packName = urlParams.get('name') || 'Kartenpaket';
-            
             if (!compressedData) return false;
-            
             try {
-                let jsonString;
-                let data = null;
-                
-                // Versuch 1: Als LZ-String dekomprimieren (neues Format)
-                jsonString = LZString.decompressFromEncodedURIComponent(compressedData);
-                
-                if (jsonString) {
-                    data = JSON.parse(jsonString);
-                } else {
-                    // Fallback: Versuche alten Base64-Import (Kompatibilität)
-                    console.log("Versuche alten Base64-Import...");
-                    try {
-                        const utf8String = decodeURIComponent(compressedData);
-                        const base64String = atob(utf8String);
-                        data = JSON.parse(base64String);
-                        showToast("Altes Link-Format erkannt, wird konvertiert.", false);
-                    } catch (oldErr) {
-                        console.error("Auch alter Base64-Import fehlgeschlagen:", oldErr);
-                    }
-                }
-                
-                if (!data || !data.problems || !data.tools) {
-                    console.warn("Ungültige Import-Daten");
-                    return false;
-                }
-                
-                const success = mergeAndImport(data.problems, data.tools, packName);
-                
-                if (success) {
-                    const newUrl = new URL(window.location.href);
-                    newUrl.searchParams.delete('data');
-                    newUrl.searchParams.delete('name');
-                    window.history.replaceState({}, '', newUrl.toString());
-                }
-                
+                let jsonString = LZString.decompressFromEncodedURIComponent(compressedData);
+                let data = jsonString ? JSON.parse(jsonString) : null;
+                if (!data || !data.problems || !data.tools) return false;
+                const success = mergeAndImport(data.problems, data.tools, urlParams.get('name') || 'Kartenpaket');
+                if (success) { const newUrl = new URL(window.location.href); newUrl.searchParams.delete('data'); newUrl.searchParams.delete('name'); window.history.replaceState({}, '', newUrl.toString()); }
                 return success;
-                
-            } catch (e) {
-                console.error("Import fehlgeschlagen:", e);
-                return false;
-            }
+            } catch (e) { return false; }
         }
-        
-        // ==================== END MAGIC LINK FUNCTIONS ====================
         
         function showToast(message, isError = false) {
             const toast = document.getElementById('toastNotification');
             const toastText = document.getElementById('toastText');
             toastText.textContent = message;
             toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
-            if(document.body.classList.contains('dark-mode') && !isError) {
-                toast.style.backgroundColor = '#2ecc71';
-                toast.style.color = '#1a1a2e';
-            } else if(isError) {
-                toast.style.backgroundColor = '#dc3545';
-                toast.style.color = 'white';
-            } else {
-                toast.style.backgroundColor = '#28a745';
-                toast.style.color = 'white';
-            }
+            if(document.body.classList.contains('dark-mode') && !isError) { toast.style.backgroundColor = '#2ecc71'; toast.style.color = '#1a1a2e'; }
+            else if(isError) { toast.style.backgroundColor = '#dc3545'; toast.style.color = 'white'; }
+            else { toast.style.backgroundColor = '#28a745'; toast.style.color = 'white'; }
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2500);
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
         
         function rebuildPools() {
-            if(onlyCustomMode) {
-                allProblems = [...customProblems];
-                allTools = [...customTools];
-            } else {
-                allProblems = [...PROBLEMS, ...customProblems];
-                allTools = [...TOOLS, ...customTools];
-            }
+            if(onlyCustomMode) { allProblems = [...customProblems]; allTools = [...customTools]; }
+            else { allProblems = [...PROBLEMS, ...customProblems]; allTools = [...TOOLS, ...customTools]; }
         }
         
         function triggerConfetti() { confetti({ particleCount: 100, spread: 65, origin: { y: 0.6 } }); }
@@ -1596,7 +1610,7 @@
             const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
             if (sortedPlayers.length === 0) { container.innerHTML = '<div class="empty-list-message"><i class="fas fa-users"></i> Noch keine Spieler vorhanden.</div>'; renderLeaderboard(); return; }
             container.innerHTML = sortedPlayers.map((p, idx) => { let medalIcon = idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':''; return `<div class="player-card"><div>${medalIcon}</div><span class="player-name">${escapeHtml(p.name)}</span><div class="player-actions"><button class="player-btn minus" data-name="${escapeHtml(p.name)}" data-delta="-1">-</button><span class="player-score">${p.score}</span><button class="player-btn plus" data-name="${escapeHtml(p.name)}" data-delta="1">+</button><button class="player-btn delete" data-name="${escapeHtml(p.name)}"><i class="fas fa-trash"></i></button></div></div>`; }).join('');
-            document.querySelectorAll('.player-btn.plus, .player-btn.minus').forEach(btn => btn.addEventListener('click', () => { const name = btn.dataset.name; const delta = parseInt(btn.dataset.delta); const idx = players.findIndex(p => p.name === name); if(idx!==-1){ players[idx].score = Math.max(0, players[idx].score+delta); localStorage.setItem('chaos_players', JSON.stringify(players)); renderPlayers(); if(delta>0) triggerConfetti(); } }));
+            document.querySelectorAll('.player-btn.plus, .player-btn.minus').forEach(btn => btn.addEventListener('click', () => { const name = btn.dataset.name; const delta = parseInt(btn.dataset.delta); const idx = players.findIndex(p => p.name === name); if(idx!==-1){ players[idx].score = Math.max(0, players[idx].score+delta); localStorage.setItem('chaos_players', JSON.stringify(players)); renderPlayers(); if(delta>0) { triggerConfetti(); soundManager.playSuccess(); } } }));
             document.querySelectorAll('.player-btn.delete').forEach(btn => btn.addEventListener('click', () => { const name = btn.dataset.name; players = players.filter(p => p.name !== name); localStorage.setItem('chaos_players', JSON.stringify(players)); renderPlayers(); showToast("Spieler gelöscht", false); }));
             renderLeaderboard();
         }
@@ -1616,11 +1630,8 @@
             const warningDiv = document.getElementById('onlyCustomWarning');
             const statusSpan = document.getElementById('onlyCustomStatus');
             if(statusSpan) statusSpan.textContent = onlyCustomMode ? "An" : "Aus";
-            if(onlyCustomMode && (customProblems.length < 5 || customTools.length < 10)) {
-                warningDiv.style.display = 'block';
-            } else {
-                warningDiv.style.display = 'none';
-            }
+            if(onlyCustomMode && (customProblems.length < 5 || customTools.length < 10)) warningDiv.style.display = 'block';
+            else warningDiv.style.display = 'none';
         }
         
         function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }); }
@@ -1639,11 +1650,42 @@
             timerBtn.classList.add('timer-active'); timerBtn.classList.remove('timer-expired');
             const update = () => { timerLabel.innerHTML = `<span class="timer-display">${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}</span>`; };
             update();
-            timerInterval = setInterval(() => { if (timeLeft <= 1) { clearInterval(timerInterval); timerActive=false; timerBtn.classList.remove('timer-active'); timerBtn.classList.add('timer-expired'); timerLabel.innerHTML=`Abgelaufen`; showToast("⏰ Zeit abgelaufen!", false); triggerConfetti(); } else { timeLeft--; update(); } }, 1000);
+            
+            timerInterval = setInterval(() => { 
+                if (timeLeft <= 1) { 
+                    clearInterval(timerInterval); 
+                    timerActive=false; 
+                    timerBtn.classList.remove('timer-active'); 
+                    timerBtn.classList.add('timer-expired'); 
+                    timerLabel.innerHTML=`Abgelaufen`; 
+                    showToast("⏰ Zeit abgelaufen!", false); 
+                    triggerConfetti();
+                    soundManager.playBuzzer();
+                } else { 
+                    timeLeft--; 
+                    update(); 
+                    if (timeLeft <= 10 && timeLeft > 0) {
+                        soundManager.playTick(timeLeft);
+                    }
+                } 
+            }, 1000);
         }
-        function handleTimerClick() { if (!timerActive) startTimer(parseInt(document.getElementById('timerDurationSelectModal').value)); else { clearInterval(timerInterval); timerActive=false; document.getElementById('timerBtn').classList.remove('timer-active'); document.getElementById('timerLabel').innerHTML=`Timer starten`; showToast("⏸ Timer gestoppt.", false); } }
+        
+        function handleTimerClick() { 
+            soundManager.resumeContext();
+            if (!timerActive) startTimer(parseInt(document.getElementById('timerDurationSelectModal').value)); 
+            else { 
+                clearInterval(timerInterval); 
+                timerActive=false; 
+                document.getElementById('timerBtn').classList.remove('timer-active'); 
+                document.getElementById('timerLabel').innerHTML=`Timer starten`; 
+                showToast("⏸ Timer gestoppt.", false); 
+            } 
+        }
         
         async function newGame() {
+            soundManager.resumeContext();
+            // Kein Shuffle-Sound mehr hier - nur noch Timer- und Punkte-Sounds
             const probEl = document.getElementById('problemText'), cards = document.querySelectorAll('.tool-card');
             cards.forEach(c=>c.classList.add('shuffling')); probEl.classList.add('shuffling');
             await new Promise(r=>setTimeout(r,380));
@@ -1660,9 +1702,7 @@
                 startTimer(parseInt(document.getElementById('timerDurationSelectModal').value)); 
                 showToast(`⚡ Speed-Pitch! Die Zeit läuft!`, false); 
             }
-            else if(currentGameMode === "crime") {
-                showToast("🔪 Crime-Pitch! Löse den Fall!", false);
-            }
+            else if(currentGameMode === "crime") { showToast("🔪 Crime-Pitch! Löse den Fall!", false); }
             
             document.querySelector('.game-card').classList.add('new-round'); setTimeout(()=>document.querySelector('.game-card').classList.remove('new-round'),420);
             cards.forEach(c=>c.classList.remove('shuffling')); probEl.classList.remove('shuffling');
@@ -1678,27 +1718,16 @@
             rebuildPools();
             updateOnlyCustomWarning();
             newGame();
-            if(onlyCustomMode && (customProblems.length < 5 || customTools.length < 10)) {
-                showToast("Hinweis: Für 'Nur eigene Karten' bitte mindestens 5 Probleme & 10 Hilfsmittel anlegen.", false);
-            }
+            if(onlyCustomMode && (customProblems.length < 5 || customTools.length < 10)) showToast("Hinweis: Für 'Nur eigene Karten' bitte mindestens 5 Probleme & 10 Hilfsmittel anlegen.", false);
         }
         
         function resetAllData() {
             if (confirm("⚠️ ACHTUNG! Dies löscht ALLE Daten:\n- Alle Spieler und Punkte\n- Alle eigenen Probleme\n- Alle eigenen Hilfsmittel\n- Alle Einstellungen\n\nDies kann NICHT rückgängig gemacht werden!\n\nWirklich alles zurücksetzen?")) {
                 localStorage.clear();
-                customProblems = [];
-                customTools = [];
-                players = [];
-                onlyCustomMode = false;
-                lastProblems = [];
-                lastTools = [];
-                allProblems = [...PROBLEMS];
-                allTools = [...TOOLS];
-                rebuildPools();
-                renderPlayers();
-                renderCustomLists();
-                updateOnlyCustomWarning();
-                newGame();
+                customProblems = []; customTools = []; players = []; onlyCustomMode = false;
+                lastProblems = []; lastTools = [];
+                allProblems = [...PROBLEMS]; allTools = [...TOOLS];
+                rebuildPools(); renderPlayers(); renderCustomLists(); updateOnlyCustomWarning(); newGame();
                 showToast("Alle Daten wurden gelöscht!", false);
                 const darkModeSwitch = document.getElementById('darkModeSwitch');
                 if(darkModeSwitch) darkModeSwitch.checked = false;
@@ -1706,6 +1735,8 @@
                 if(document.getElementById('darkModeStatus')) document.getElementById('darkModeStatus').textContent = "Aus";
                 const onlyCustomCheck = document.getElementById('onlyCustomCardsToggle');
                 if(onlyCustomCheck) onlyCustomCheck.checked = false;
+                const soundToggle = document.getElementById('soundToggle');
+                if(soundToggle) { soundToggle.checked = true; soundManager.setEnabled(true); }
             }
         }
         
@@ -1713,28 +1744,15 @@
             const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
             const darkModeSwitch = document.getElementById('darkModeSwitch');
             const darkModeStatus = document.getElementById('darkModeStatus');
-            if(darkModeEnabled) {
-                document.body.classList.add('dark-mode');
-                if(darkModeSwitch) darkModeSwitch.checked = true;
-                if(darkModeStatus) darkModeStatus.textContent = "An";
-            } else {
-                if(darkModeSwitch) darkModeSwitch.checked = false;
-                if(darkModeStatus) darkModeStatus.textContent = "Aus";
-            }
+            if(darkModeEnabled) { document.body.classList.add('dark-mode'); if(darkModeSwitch) darkModeSwitch.checked = true; if(darkModeStatus) darkModeStatus.textContent = "An"; }
+            else { if(darkModeSwitch) darkModeSwitch.checked = false; if(darkModeStatus) darkModeStatus.textContent = "Aus"; }
         }
         
         function toggleDarkMode() {
             const darkModeSwitch = document.getElementById('darkModeSwitch');
             const darkModeStatus = document.getElementById('darkModeStatus');
-            if(darkModeSwitch.checked) {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('darkMode', 'true');
-                if(darkModeStatus) darkModeStatus.textContent = "An";
-            } else {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('darkMode', 'false');
-                if(darkModeStatus) darkModeStatus.textContent = "Aus";
-            }
+            if(darkModeSwitch.checked) { document.body.classList.add('dark-mode'); localStorage.setItem('darkMode', 'true'); if(darkModeStatus) darkModeStatus.textContent = "An"; }
+            else { document.body.classList.remove('dark-mode'); localStorage.setItem('darkMode', 'false'); if(darkModeStatus) darkModeStatus.textContent = "Aus"; }
         }
         
         document.getElementById('exportCardsBtn')?.addEventListener('click', exportDecks);
@@ -1755,38 +1773,22 @@
         document.getElementById('closeSettingsModal')?.addEventListener('click',()=>document.getElementById('settingsModal').style.display='none');
         document.getElementById('closePrivacyModal')?.addEventListener('click',()=>document.getElementById('privacyModal').style.display='none');
         document.getElementById('resetAllBtn')?.addEventListener('click', resetAllData);
-       
-        // Schließe Modals durch Klick auf den Hintergrund (Mobile und Desktop)
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        });
+        
+        const soundToggle = document.getElementById('soundToggle');
+        if(soundToggle) { soundToggle.checked = soundManager.isEnabled(); soundToggle.addEventListener('change', () => { soundManager.setEnabled(soundToggle.checked); soundManager.resumeContext(); }); }
+        
+        document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; }); });
         
         const onlyCustomCheckbox = document.getElementById('onlyCustomCardsToggle');
-        if(onlyCustomCheckbox) {
-            onlyCustomCheckbox.checked = onlyCustomMode;
-            onlyCustomCheckbox.addEventListener('change', toggleOnlyCustomMode);
-        }
+        if(onlyCustomCheckbox) { onlyCustomCheckbox.checked = onlyCustomMode; onlyCustomCheckbox.addEventListener('change', toggleOnlyCustomMode); }
         
         const darkModeSwitch = document.getElementById('darkModeSwitch');
-        if(darkModeSwitch) {
-            darkModeSwitch.addEventListener('change', toggleDarkMode);
-        }
+        if(darkModeSwitch) darkModeSwitch.addEventListener('change', toggleDarkMode);
         
         window.addEventListener('click',(e)=>{ if(e.target.classList.contains('modal')) e.target.style.display='none'; });
         
         window.addEventListener('load', async () => {
-            rebuildPools();
-            renderPlayers();
-            renderCustomLists();
-            initDarkMode();
-            updateUILabels();
-            newGame();
-            updateOnlyCustomWarning();
-            await handleUrlImport();
+            rebuildPools(); renderPlayers(); renderCustomLists(); initDarkMode(); updateUILabels(); newGame(); updateOnlyCustomWarning(); await handleUrlImport();
         });
     </script>
 </body>
