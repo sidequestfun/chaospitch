@@ -20,6 +20,8 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <!-- LZ-String für kompakte URL-Links -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 
     <style>
         * {
@@ -1365,30 +1367,7 @@
         let timerInterval = null, timerActive = false;
         let currentGameMode = "standard";
         
-        // ==================== MAGIC LINK FUNCTIONS ====================
-        
-        function encodeForUrl(data) {
-            try {
-                const jsonString = JSON.stringify(data);
-                const utf8String = encodeURIComponent(jsonString);
-                const base64 = btoa(utf8String);
-                return base64;
-            } catch (e) {
-                console.error("Encode error:", e);
-                return null;
-            }
-        }
-        
-        function decodeFromUrl(base64) {
-            try {
-                const utf8String = atob(base64);
-                const jsonString = decodeURIComponent(utf8String);
-                return JSON.parse(jsonString);
-            } catch (e) {
-                console.error("Decode error:", e);
-                return null;
-            }
-        }
+        // ==================== LZ-STRING KOMPRIMIERTE MAGIC LINK FUNCTIONS ====================
         
         function generateShareLink() {
             const deckData = {
@@ -1396,22 +1375,24 @@
                 tools: customTools
             };
             
-            const encoded = encodeForUrl(deckData);
-            if (!encoded) {
+            try {
+                // Komprimiere den JSON-String direkt in ein URL-sicheres Format
+                const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(deckData));
+                const url = new URL(window.location.href);
+                url.searchParams.set('data', compressed);
+                
+                let packName = "Mein Deck";
+                if (customProblems.length + customTools.length > 0) {
+                    packName = `${customProblems.length} Probleme, ${customTools.length} Hilfsmittel`;
+                }
+                url.searchParams.set('name', packName);
+                
+                return url.toString();
+            } catch (e) {
+                console.error("LZ-String Fehler:", e);
                 showToast("Fehler beim Erstellen des Links", true);
                 return null;
             }
-            
-            const url = new URL(window.location.href);
-            url.searchParams.set('data', encoded);
-            
-            let packName = "Mein Deck";
-            if (customProblems.length + customTools.length > 0) {
-                packName = `${customProblems.length} Probleme, ${customTools.length} Hilfsmittel`;
-            }
-            url.searchParams.set('name', packName);
-            
-            return url.toString();
         }
         
         function shareDeck() {
@@ -1483,27 +1464,53 @@
         
         async function handleUrlImport() {
             const urlParams = new URLSearchParams(window.location.search);
-            const encodedData = urlParams.get('data');
+            const compressedData = urlParams.get('data');
             const packName = urlParams.get('name') || 'Kartenpaket';
             
-            if (!encodedData) return false;
+            if (!compressedData) return false;
             
-            const decodedData = decodeFromUrl(encodedData);
-            if (!decodedData || !decodedData.problems || !decodedData.tools) {
-                console.warn("Ungültige Import-Daten");
+            try {
+                let jsonString;
+                let data = null;
+                
+                // Versuch 1: Als LZ-String dekomprimieren (neues Format)
+                jsonString = LZString.decompressFromEncodedURIComponent(compressedData);
+                
+                if (jsonString) {
+                    data = JSON.parse(jsonString);
+                } else {
+                    // Fallback: Versuche alten Base64-Import (Kompatibilität)
+                    console.log("Versuche alten Base64-Import...");
+                    try {
+                        const utf8String = decodeURIComponent(compressedData);
+                        const base64String = atob(utf8String);
+                        data = JSON.parse(base64String);
+                        showToast("Altes Link-Format erkannt, wird konvertiert.", false);
+                    } catch (oldErr) {
+                        console.error("Auch alter Base64-Import fehlgeschlagen:", oldErr);
+                    }
+                }
+                
+                if (!data || !data.problems || !data.tools) {
+                    console.warn("Ungültige Import-Daten");
+                    return false;
+                }
+                
+                const success = mergeAndImport(data.problems, data.tools, packName);
+                
+                if (success) {
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.delete('data');
+                    newUrl.searchParams.delete('name');
+                    window.history.replaceState({}, '', newUrl.toString());
+                }
+                
+                return success;
+                
+            } catch (e) {
+                console.error("Import fehlgeschlagen:", e);
                 return false;
             }
-            
-            const success = mergeAndImport(decodedData.problems, decodedData.tools, packName);
-            
-            if (success) {
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.delete('data');
-                newUrl.searchParams.delete('name');
-                window.history.replaceState({}, '', newUrl.toString());
-            }
-            
-            return success;
         }
         
         // ==================== END MAGIC LINK FUNCTIONS ====================
