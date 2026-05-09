@@ -2,7 +2,7 @@
 
 Löse absurde Probleme mit noch absurderen Hilfsmitteln. Du bekommst ein Problem und 3 Hilfsmittel. Erfinde eine kreative Lösung – mindestens eines der Hilfsmittel muss vorkommen! Je absurder, desto besser.
 
-Jetzt spielen: [chaospitch.com](https://chaospitch.com)
+Jetzt spielen: [chaospitch.com]([https://chaospitch.com](http://sidequestfun.github.io/chaospitch))
 
 ## ✨ Features
 * **Spielmodi:** Klassisch, Crime Mode & Speed Mode
